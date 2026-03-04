@@ -395,13 +395,14 @@
         <div class="modal-card">
             <button class="modal-close" onclick="closeModal('codeModal')">×</button>
             <h3 class="modal-title">💻 KODLA: ETİKET DEDEKTİFİ</h3>
-            <p style="font-size:0.85rem;color:#aaa;">Ürün kartlarını JavaScript ile nasıl oluşturduk?</p>
-            <div class="code-box" id="codeContent">Yükleniyor...</div>
-            <div style="display:flex;gap:8px;margin-top:10px;">
-                <button class="copy-btn" onclick="kopyala()" style="flex:1;">📋 KODU KOPYALA</button>
-                <a href="https://app.talent14.com/codeEditor" target="_blank"
-                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
-                    Talent14</a>
+            <p style="font-size:0.85rem;color:#aaa;">Bu tasarımı kodlamak için "Kodu Kopyala" butonuna bas ve Talent14
+                editörüne yapıştır!</p>
+            <div style="display:flex;gap:8px;margin-top:15px;">
+                <button id="copyBtn" class="hud-btn btn-code" onclick="copyStudentCode()"
+                    style="padding:10px 15px;font-weight:bold;flex:1;">📄 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank" class="hud-btn btn-code"
+                    style="padding:10px 15px;background:#6e40c9;color:#fff;border-color:#6e40c9;font-weight:bold;flex:1;text-decoration:none;display:flex;align-items:center;justify-content:center;">💻
+                    EDİTÖRDE DENE</a>
             </div>
         </div>
     </div>
@@ -414,8 +415,23 @@
         function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 5, harf: 'M' }, '*'); else window.location.href = 'index.html'; }
         function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
         document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
-        function kopyala() { fetch('ogrenci_kodu5.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
-        fetch('ogrenci_kodu5.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+        function copyStudentCode() {
+            const btn = document.getElementById('copyBtn');
+            btn.innerHTML = "⌛...";
+            fetch('ogrenci_kodu5.txt').then(r => r.text()).then(kod => {
+                if (navigator.clipboard && window.isSecureContext && window.parent === window) {
+                    return navigator.clipboard.writeText(kod);
+                } else {
+                    const ta = document.createElement('textarea');
+                    ta.value = kod; ta.style.position = 'fixed'; ta.style.left = '-9999px';
+                    document.body.appendChild(ta); ta.select(); document.execCommand('copy');
+                    document.body.removeChild(ta);
+                }
+            }).then(() => {
+                btn.innerHTML = "✓ TAMAM"; btn.style.background = "#2ecc71";
+                setTimeout(() => { btn.innerHTML = "📄 KODU KOPYALA"; btn.style.background = "transparent"; }, 2000);
+            }).catch(() => alert("Dosya bulunamadı!"));
+        }
 
         const levels = [
             { name: "Süt (1L)", emoji: "🥛", items: [{ id: 1, price: 24.50, brand: "Marka A" }, { id: 2, price: 24.25, brand: "Marka B" }] },
