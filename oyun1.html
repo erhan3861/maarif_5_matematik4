@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Taraftar Ligi - Görev 1</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Russo+One&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: #2ecc71;
+            background-image: linear-gradient(rgba(0, 0, 0, 0.1) 2px, transparent 2px), linear-gradient(90deg, rgba(0, 0, 0, 0.1) 2px, transparent 2px), linear-gradient(rgba(0, 0, 0, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 0, 0, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px, 50px 50px, 10px 10px, 10px 10px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(44, 62, 80, 0.92);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: #f1c40f;
+        }
+
+        .hud-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #f1c40f;
+            color: #2c3e50;
+        }
+
+        .btn-code {
+            border-color: #3498db;
+            color: #3498db;
+        }
+
+        .btn-code:hover {
+            background: #3498db;
+            color: #fff;
+        }
+
+        .stadium-container {
+            background: #2c3e50;
+            border: 8px solid #ecf0f1;
+            border-radius: 40px;
+            padding: 20px;
+            width: 90%;
+            max-width: 700px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            margin-top: 55px;
+        }
+
+        .scoreboard {
+            background: #000;
+            color: #ff0000;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            width: 80%;
+            padding: 10px;
+            border: 4px solid #555;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            text-shadow: 0 0 10px red;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        .question-text {
+            font-size: 1.1rem;
+            margin-bottom: 15px;
+            color: #ecf0f1;
+        }
+
+        .tribune {
+            display: grid;
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            background: #34495e;
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        .seat {
+            width: 25px;
+            height: 25px;
+            background: #7f8c8d;
+            border-radius: 5px;
+            transition: transform 0.3s;
+        }
+
+        .seat.red {
+            background: #e74c3c;
+            box-shadow: 0 0 5px #c0392b;
+            animation: cheer 0.5s infinite alternate;
+        }
+
+        .seat.blue {
+            background: #3498db;
+            box-shadow: 0 0 5px #2980b9;
+            animation: cheer 0.6s infinite alternate-reverse;
+        }
+
+        @keyframes cheer {
+            from {
+                transform: translateY(0);
+            }
+
+            to {
+                transform: translateY(-3px);
+            }
+        }
+
+        .vs-panel {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        .team-btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-family: 'Russo One', sans-serif;
+            font-size: 1.2rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s;
+            box-shadow: 0 5px 0 rgba(0, 0, 0, 0.3);
+            min-width: 150px;
+        }
+
+        .btn-red {
+            background: #e74c3c;
+            border-bottom: 5px solid #c0392b;
+        }
+
+        .btn-blue {
+            background: #3498db;
+            border-bottom: 5px solid #2980b9;
+        }
+
+        .btn-equal {
+            background: #f1c40f;
+            border-bottom: 5px solid #f39c12;
+            color: #2c3e50;
+        }
+
+        .team-btn:active {
+            transform: translateY(4px);
+            border-bottom-width: 0;
+        }
+
+        .team-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 30px;
+            text-align: center;
+        }
+
+        .secret-reveal {
+            border: 2px dashed #f1c40f;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(241, 196, 15, 0.1);
+            margin-top: 15px;
+            display: none;
+        }
+
+        .secret-letter-big {
+            font-size: 3.5rem;
+            color: #f1c40f;
+            font-weight: bold;
+            font-family: 'Orbitron';
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            padding: 12px 30px;
+            background: #2ecc71;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Russo One';
+        }
+
+        .discovery-area {
+            margin-top: 15px;
+            width: 100%;
+        }
+
+        .discovery-bubble {
+            background: rgba(241, 196, 15, 0.9);
+            border-left: 4px solid #e67e22;
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: #333;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: center;
+            opacity: 0;
+            z-index: 50;
+            animation: bubbleFadeIn 0.8s ease forwards;
+        }
+
+        @keyframes bubbleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #10142b;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #c8d6e5;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #f1c40f;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #f1c40f;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #6e40c9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">⚽ TARAFTAR LİGİ</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="stadium-container">
+        <div class="scoreboard">
+            <span style="color:#e74c3c;">KIRMIZI</span>
+            <span id="score-text">MAÇ 1</span>
+            <span style="color:#3498db;">MAVİ</span>
+        </div>
+        <div class="question-text">Hangi taraftar grubu stadyumda daha fazla yer kaplıyor?</div>
+        <div class="tribune" id="tribune"></div>
+        <div class="vs-panel">
+            <button class="team-btn btn-red" onclick="makeChoice('red')">KIRMIZI<br><span id="frac-red"
+                    style="font-size:0.8rem;">1/2</span></button>
+            <button class="team-btn btn-equal" onclick="makeChoice('equal')">EŞİT<br><span
+                    style="font-size:0.8rem;">=</span></button>
+            <button class="team-btn btn-blue" onclick="makeChoice('blue')">MAVİ<br><span id="frac-blue"
+                    style="font-size:0.8rem;">1/4</span></button>
+        </div>
+        <div class="discovery-area" id="discoveryArea"></div>
+
+        <div class="feedback-overlay" id="feedback">
+            <h1 style="font-size:3.5rem;margin:0;">⚽</h1>
+            <h2 style="color:#2ecc71;" id="fb-title">GOOOL!</h2>
+            <p id="fb-msg">Doğru analiz. Tribünlerin hakimi belli oldu.</p>
+            <div class="secret-reveal" id="secret-reveal">
+                🔐 GİZLİ HARF:<br>
+                <span class="secret-letter-big">S</span><br>
+                <small style="color:#aaa;">Bu harfi şifre panelinde kullan!</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SIRADAKİ MAÇ ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#f1c40f;color:#2c3e50;"
+                onclick="gorevTamamla()">🏠 Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">⚽ GÖREV: TARAFTAR LİGİ</h3>
+            <p><b style="color:#f1c40f;">MAT.5.1.4</b> — Kesirleri görsel olarak karşılaştır.</p>
+            <hr style="border-color:rgba(255,255,255,0.1);margin:15px 0;">
+            <p>📌 Tribündeki kırmızı ve mavi koltukları say. Hangi kesir daha büyük?</p>
+            <p>💡 Aynı paydaya getirerek ya da görsel sayarak karşılaştır!</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: TARAFTAR LİGİ</h3>
+            <p style="font-size:0.85rem;color:#aaa;">Koltuk dağılımını JavaScript ile nasıl yaptım?</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="copy-btn" onclick="kopyala()" id="copyBtn" style="flex:1;">📋 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank"
+                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
+                    Talent14</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 1, harf: 'S' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu1.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu1.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+        function showDiscovery(text) { document.getElementById('discoveryArea').innerHTML = `<div class="discovery-bubble">${text}</div>`; }
+
+        const TOTAL_SEATS = 50;
+        const levels = [
+            { rText: "10/50", rVal: 10, bText: "25/50", bVal: 25 },
+            { rText: "1/2", rVal: 25, bText: "1/5", bVal: 10 },
+            { rText: "20/50", rVal: 20, bText: "4/10", bVal: 20 },
+            { rText: "3/10", rVal: 15, bText: "1/2", bVal: 25 },
+            { rText: "40/50", rVal: 40, bText: "1/5", bVal: 10 }
+        ];
+        const discoveries = [
+            "💡 Aynı paydaya bak! 10/50 ve 25/50 karşılaştırması kolaylaşır.",
+            "💡 1/2 = 25/50, 1/5 = 10/50. Paydayı eşitlersek kolaylaşır!",
+            "💡 20/50 = 4/10. Farklı görünseler de eşit olabilir! (Denk kesir)",
+            "💡 3/10 = 15/50. Yarım (1/2=25/50)'den küçük olduğu görülüyor.",
+            "💡 40/50 büyük bir kesir — %80 demek! 1/5 sadece %20."
+        ];
+        let currentIdx = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('score-text').innerText = 'MAÇ ' + (currentIdx + 1);
+            document.getElementById('frac-red').innerText = d.rText;
+            document.getElementById('frac-blue').innerText = d.bText;
+            document.getElementById('feedback').style.display = 'none';
+            renderSeats(d.rVal, d.bVal);
+            if (currentIdx > 0) showDiscovery(discoveries[currentIdx - 1]);
+        }
+        function renderSeats(r, b) {
+            const c = document.getElementById('tribune'); c.innerHTML = '';
+            let seats = [];
+            for (let i = 0; i < r; i++)seats.push('red');
+            for (let i = 0; i < b; i++)seats.push('blue');
+            for (let i = 0; i < (TOTAL_SEATS - r - b); i++)seats.push('empty');
+            seats.forEach(type => { const s = document.createElement('div'); s.className = 'seat ' + type; c.appendChild(s); });
+        }
+        function makeChoice(choice) {
+            const d = levels[currentIdx];
+            let correct = d.rVal > d.bVal ? 'red' : (d.bVal > d.rVal ? 'blue' : 'equal');
+            if (choice === correct) {
+                const isLast = currentIdx === levels.length - 1;
+                document.getElementById('fb-title').innerText = isLast ? 'ŞAMPİYON!' : 'GOOOL!';
+                document.getElementById('fb-msg').innerText = isLast ? 'Tüm maç analizlerini doğru yaptın. İşte gizli harf:' : 'Doğru analiz. Tribünlerin hakimi belli.';
+                document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                document.getElementById('feedback').style.display = 'flex';
+                if (isLast) showDiscovery(discoveries[4]);
+            } else {
+                alert('Yanlış Tahmin! Koltuklara ve kesirlere dikkatli bak.');
+            }
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

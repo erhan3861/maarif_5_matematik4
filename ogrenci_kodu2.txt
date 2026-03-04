@@ -1,0 +1,309 @@
+<!-- ============================================================
+   🌍 ADİL PAYLAŞIM - ÖĞRENCİ KODU
+   📌 Konu: Alan Modeli ile Kesirleri Karşılaştırma
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — Grid (ızgara) ile kesir karşılaştırma
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Adil Paylaşım - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #8bc34a;     /* Yeşil çimen rengi */
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        h2 { color: #2c3e50; margin-bottom: 15px; }
+
+        /* ===== OYUN TAHTASI ===== */
+        .tahta {
+            background: rgba(255,255,255,0.95);
+            border: 8px solid #5d4037;     /* Kahverengi çit rengi */
+            border-radius: 20px;
+            padding: 25px;
+            text-align: center;
+            /* box-shadow = Dışa gölge (zemine düşen gölge etkisi) */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            max-width: 700px;
+            width: 90%;
+        }
+
+        .soru { font-size: 1.2rem; color: #33691e; font-weight: bold; margin-bottom: 20px; }
+
+        /* ===== ARAZİLER ===== */
+        .araziler {
+            display: flex;          /* Yan yana diz */
+            gap: 40px;              /* Aralarında boşluk */
+            justify-content: center;
+            margin-bottom: 25px;
+        }
+
+        .arazi-grubu {
+            display: flex;
+            flex-direction: column; /* Alt alta: arazi, sonra isim etiketi */
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Arazi karesi: CSS Grid ile bölmelere ayrılır */
+        .arazi {
+            width: 160px;
+            height: 160px;
+            background: #fff;
+            border: 4px solid #333;
+            /* display: grid → İçini ızgaraya böler */
+            /* Kaç bölme olacağı JS tarafından ayarlanır */
+            display: grid;
+            overflow: hidden;              /* Taşanları gizle */
+            box-shadow: 5px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Her ızgara hücresi = 1 parça arazi */
+        .hucre {
+            /* border: 1px dashed = Bölme çizgileri */
+            border: 1px dashed rgba(0,0,0,0.2);
+            background: #e0e0e0;           /* Gri = Sahipsiz arazi */
+            /* transition = Renk değişimi animasyonu */
+            transition: background 0.4s;
+        }
+
+        /* .sahip → Sahip olunan arazi parçası */
+        .hucre.sahip {
+            background: #8bc34a;           /* Yeşil = Sahipli arazi */
+            /* repeating-linear-gradient = Çapraz çizgi deseni */
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 5px,
+                rgba(255,255,255,0.3) 5px,
+                rgba(255,255,255,0.3) 10px
+            );
+        }
+
+        /* Sahip isim etiketi */
+        .sahip-etiketi {
+            background: #333;
+            color: #fff;
+            font-size: 1rem;
+            font-weight: bold;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+
+        /* ===== KARŞILAŞTIRMA BUTONLARI ===== */
+        .butonlar {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .karsilastir {
+            width: 60px; height: 60px;
+            border-radius: 50%;            /* Daire buton */
+            border: none;
+            font-size: 1.4rem;
+            cursor: pointer;
+            color: white;
+            /* box-shadow 3D buton efekti */
+            box-shadow: 0 4px 0 rgba(0,0,0,0.3);
+            transition: transform 0.1s;
+        }
+        .btn-sol, .btn-sag { background: #e67e22; }   /* Turuncu */
+        .btn-esit           { background: #95a5a6; }   /* Gri */
+
+        .karsilastir:active { transform: translateY(4px); box-shadow: none; }
+        .karsilastir:hover  { filter: brightness(1.1); }
+
+        .mesaj { margin-top: 15px; font-size: 1rem; font-weight: bold; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>🌍 Adil Paylaşım</h2>
+
+    <div class="tahta">
+        <div class="soru">Hangi kardeşin arazisi daha büyük?</div>
+
+        <div class="araziler">
+            <!-- Sol arazi -->
+            <div class="arazi-grubu">
+                <div class="arazi" id="arazi-sol"></div>
+                <div class="sahip-etiketi">
+                    ALİ (<span id="kesir-sol">1/2</span>)
+                </div>
+            </div>
+            <!-- Sağ arazi -->
+            <div class="arazi-grubu">
+                <div class="arazi" id="arazi-sag"></div>
+                <div class="sahip-etiketi">
+                    AYŞE (<span id="kesir-sag">1/4</span>)
+                </div>
+            </div>
+        </div>
+
+        <!-- Sol > Sağ, Eşit, Sol < Sağ seçimleri -->
+        <div class="butonlar">
+            <button class="karsilastir btn-sol" onclick="cevapla('sol')">&gt;</button>
+            <button class="karsilastir btn-esit" onclick="cevapla('esit')">=</button>
+            <button class="karsilastir btn-sag" onclick="cevapla('sag')">&lt;</button>
+        </div>
+
+        <div class="mesaj" id="mesaj"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: SEVİYE VERİLERİ
+    // ============================================================
+
+    // Her nesne bir kesir karşılaştırma sorusunu temsil eder:
+    //   sol  = Sol arazinin bilgileri
+    //     pay    = Kesrin payı (sahip olunan parça sayısı)
+    //     payda  = Kesrin paydası (toplam parça sayısı)
+    //     sutun  = Grid'deki sütun sayısı
+    //     satir  = Grid'deki satır sayısı
+    //     deger  = Ondalık değeri (karşılaştırmak için)
+    //
+    // 💡 ÖNEMLİ: sutun × satir = payda olmalı!
+    //   1/2: 1 sütun × 2 satır = 2 parça (payda)
+    //   1/4: 2 sütun × 2 satır = 4 parça (payda)
+    const seviyeler = [
+        {
+            sol: { pay:1, payda:2, sutun:1, satir:2, deger:0.5 },
+            sag: { pay:1, payda:4, sutun:2, satir:2, deger:0.25 }
+        }, // 1/2 > 1/4
+        {
+            sol: { pay:2, payda:4, sutun:2, satir:2, deger:0.5 },
+            sag: { pay:1, payda:2, sutun:1, satir:2, deger:0.5 }
+        }, // 2/4 = 1/2 (Denk Kesir!)
+        {
+            sol: { pay:3, payda:4, sutun:2, satir:2, deger:0.75 },
+            sag: { pay:2, payda:3, sutun:1, satir:3, deger:0.66 }
+        }  // 3/4 > 2/3
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutIdx = 0;
+
+    window.onload = function() { seviyeYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: SEVİYE YÜKLEME
+    // ============================================================
+
+    function seviyeYukle() {
+        if (mevcutIdx >= seviyeler.length) {
+            document.querySelector('.tahta').innerHTML =
+                '<h2 style="color:#33691e;">🏆 ADİL PAYLAŞIM!</h2>' +
+                '<p>Tüm kadastro işlemlerini doğru tamamladın!</p>';
+            return;
+        }
+        const s = seviyeler[mevcutIdx];
+        // Template literal ile kesri göster
+        document.getElementById('kesir-sol').innerText =
+            `${s.sol.pay}/${s.sol.payda}`;
+        document.getElementById('kesir-sag').innerText =
+            `${s.sag.pay}/${s.sag.payda}`;
+        document.getElementById('mesaj').innerText = '';
+        araziCiz('arazi-sol', s.sol);
+        araziCiz('arazi-sag', s.sag);
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: ARAZİ ÇİZME
+    // ============================================================
+
+    function araziCiz(elemId, arazi) {
+        const kutu = document.getElementById(elemId);
+        kutu.innerHTML = '';   // Eski içeriği sil
+
+        // CSS Grid: Kaç sütun? (repeat = tekrar et)
+        kutu.style.gridTemplateColumns = `repeat(${arazi.sutun}, 1fr)`;
+        kutu.style.gridTemplateRows    = `repeat(${arazi.satir}, 1fr)`;
+
+        // payda kadar hücre oluştur
+        // i < pay → Yeşil (sahipli), sonrası → Gri (sahipsiz)
+        for (let i = 0; i < arazi.payda; i++) {
+            const hucre = document.createElement('div');
+            hucre.className = 'hucre';
+            if (i < arazi.pay) {
+                hucre.classList.add('sahip');  // classList.add = class ekle
+            }
+            kutu.appendChild(hucre);
+        }
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 5: CEVAP KONTROLÜ
+    // ============================================================
+
+    function cevapla(secilen) {
+        const s = seviyeler[mevcutIdx];
+        let dogru = '';
+        if      (s.sol.deger > s.sag.deger) dogru = 'sol';
+        else if (s.sag.deger > s.sol.deger) dogru = 'sag';
+        else                                 dogru = 'esit';
+
+        const mesaj = document.getElementById('mesaj');
+        if (secilen === dogru) {
+            mesaj.innerText = '✅ Doğru! Araziler doğru karşılaştırıldı.';
+            mesaj.style.color = '#2e7d32';
+            setTimeout(function() { mevcutIdx++; seviyeYukle(); }, 1800);
+        } else {
+            alert('Hatalı! Yeşil kareleri say ve karşılaştır.');
+        }
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Arazi rengini değiştir
+→ .hucre.sahip { background: #8bc34a; } satırını bul
+→ #8bc34a (yeşil) yerine #ff9f43 (turuncu) yaz
+→ Sahipli arazi turuncu renk alacak!
+
+GÖREV 2 (Kolay): Arazi çerçevesini kalınlaştır
+→ .arazi { border: 4px solid #333; } satırını bul
+→ 4px yerine 8px yaz
+→ Arazi sınırı çok daha belirgin görünecek!
+
+GÖREV 3 (Orta): Yeni bir karşılaştırma sorusu ekle
+→ const seviyeler = [ ... ]; dizisine ekle:
+   , {
+       sol: { pay:1, payda:3, sutun:1, satir:3, deger:0.33 },
+       sag: { pay:2, payda:6, sutun:2, satir:3, deger:0.33 }
+   }
+→ 1/3 ve 2/6 denk kesirdir! (Her ikisi de 0.33 = eşit)
+
+GÖREV 4 (Zor): Kalan parça sayısını göster
+→ araziCiz() fonksiyonunun içine, for döngüsünden SONRA ekle:
+   const bosParca = arazi.payda - arazi.pay;
+   const bilgi = document.createElement('div');
+   bilgi.style.cssText = 'font-size:0.75rem; color:#888; margin-top:5px;';
+   bilgi.innerText = bosParca + ' parça sahipsiz kaldı';
+   kutu.parentElement.appendChild(bilgi);
+→ Her arazinin altında "X parça sahipsiz kaldı" yazar!
+
+============================================================ -->

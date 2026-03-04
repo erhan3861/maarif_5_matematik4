@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MAT.5.1.4 - Kesirlerde Sıralama</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&family=Fredoka:wght@400;600&family=Nunito:wght@400;700;900&display=swap"
+        rel="stylesheet">
+    <style>
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Fredoka', sans-serif;
+            background: #10142b;
+            background-image:
+                radial-gradient(ellipse at 20% 20%, rgba(255, 94, 98, 0.08) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 80%, rgba(255, 153, 102, 0.08) 0%, transparent 50%);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            text-align: center;
+            padding: 25px 20px 10px;
+            flex-shrink: 0;
+        }
+
+        .theme-tag {
+            background: linear-gradient(90deg, #FF5E62, #FF9966);
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 4px 14px;
+            border-radius: 15px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: white;
+            display: inline-block;
+            margin-bottom: 8px;
+        }
+
+        h1 {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 1.8rem;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255, 94, 98, 0.4);
+            letter-spacing: 1px;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.5);
+            margin-top: 4px;
+        }
+
+        /* ===== KART IZGARASI ===== */
+        .grid-wrapper {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 0 20px 10px;
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: 18px;
+            width: 100%;
+            max-width: 900px;
+            height: 340px;
+        }
+
+        /* ===== OYUN KARTI ===== */
+        .game-card {
+            background: #1a2040;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 16px;
+            padding: 18px;
+            text-align: center;
+            text-decoration: none;
+            color: #e0e0e0;
+            position: relative;
+            overflow: hidden;
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.3s, box-shadow 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+        }
+
+        .game-card::before {
+            content: '';
+            position: absolute;
+            top: -100%;
+            left: -100%;
+            width: 60%;
+            height: 300%;
+            background: linear-gradient(105deg, transparent 40%, rgba(255, 255, 255, 0.07) 50%, transparent 60%);
+            transition: 0.6s;
+            pointer-events: none;
+        }
+
+        .game-card:hover::before {
+            top: -50%;
+            left: 150%;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .card-1:hover {
+            border-color: #ff9f43;
+            box-shadow: 0 12px 30px rgba(255, 159, 67, 0.2);
+        }
+
+        .card-2:hover {
+            border-color: #1dd1a1;
+            box-shadow: 0 12px 30px rgba(29, 209, 161, 0.2);
+        }
+
+        .card-3:hover {
+            border-color: #54a0ff;
+            box-shadow: 0 12px 30px rgba(84, 160, 255, 0.2);
+        }
+
+        .card-4:hover {
+            border-color: #5f27cd;
+            box-shadow: 0 12px 30px rgba(95, 39, 205, 0.2);
+        }
+
+        .card-5:hover {
+            border-color: #ee5253;
+            box-shadow: 0 12px 30px rgba(238, 82, 83, 0.2);
+        }
+
+        .card-6:hover {
+            border-color: #00d2ff;
+            box-shadow: 0 12px 30px rgba(0, 210, 255, 0.2);
+        }
+
+        .card-icon {
+            font-size: 2.2rem;
+            margin-bottom: 8px;
+            display: block;
+        }
+
+        .card-title {
+            font-family: 'Fredoka', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #fff;
+        }
+
+        .card-desc {
+            font-size: 0.78rem;
+            color: rgba(255, 255, 255, 0.45);
+            margin-top: 4px;
+            line-height: 1.3;
+        }
+
+        .card-num {
+            position: absolute;
+            top: 10px;
+            right: 12px;
+            font-family: 'Orbitron';
+            font-size: 0.65rem;
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        /* Tamamlanan kart */
+        .game-card.completed {
+            border-color: rgba(46, 213, 115, 0.5) !important;
+        }
+
+        .game-card.completed::after {
+            content: '✓';
+            position: absolute;
+            top: 8px;
+            left: 12px;
+            color: #2ed573;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        /* ===== ŞİFRE PANELİ — mat10 standardı ===== */
+        .password-panel {
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid #ff9f43;
+            padding: 10px 24px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 14px;
+            width: 90%;
+            max-width: 900px;
+            animation: panelPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes panelPulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 5px rgba(255, 159, 67, 0.2);
+            }
+
+            50% {
+                box-shadow: 0 0 15px rgba(255, 159, 67, 0.4);
+            }
+        }
+
+        .letter-box {
+            width: 38px;
+            height: 38px;
+            background: #1e2749;
+            border: 2px solid #34495e;
+            border-radius: 5px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.4rem;
+            font-weight: bold;
+            font-family: 'Orbitron', sans-serif;
+            transition: all 0.5s ease;
+            color: #8395a7;
+        }
+
+        .letter-box.active {
+            background: #FF5E62;
+            color: #fff;
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255, 94, 98, 0.6);
+            transform: scale(1.1);
+        }
+
+        @keyframes letterReveal {
+            0% {
+                transform: scale(0.5) rotateY(180deg);
+                opacity: 0;
+            }
+
+            100% {
+                transform: scale(1.1) rotateY(0deg);
+                opacity: 1;
+            }
+        }
+
+        .letter-box.reveal {
+            animation: letterReveal 0.6s ease forwards;
+        }
+
+        /* ===== GAME VIEW (iframe) ===== */
+        #game-view {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #000;
+            z-index: 500;
+            display: none;
+            flex-direction: column;
+        }
+
+        #game-view.active {
+            display: flex;
+        }
+
+        #game-frame {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+
+        /* ===== BAŞARI MODAL ===== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            /* Dikey ortala */
+            justify-content: center;
+            /* Yatay ortala */
+        }
+
+        .pass-modal {
+            background: #0d1530;
+            border: 1px solid #ff9f43;
+            box-shadow: 0 0 30px rgba(255, 159, 67, 0.25);
+            border-radius: 18px;
+            padding: 32px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .pass-modal h2 {
+            font-family: 'Orbitron';
+            color: #FF5E62;
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+        }
+
+        .success-icon {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+            animation: bounce 1s infinite;
+        }
+
+        @keyframes bounce {
+
+            0%,
+            100% {
+                transform: translateY(0)
+            }
+
+            50% {
+                transform: translateY(-10px)
+            }
+        }
+
+        .modal-close-btn {
+            margin-top: 20px;
+            padding: 10px 30px;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Fredoka';
+            font-size: 1rem;
+        }
+
+        /* ===== TAM EKRAN ===== */
+        #fullscreen-btn {
+            position: fixed;
+            bottom: 18px;
+            right: 18px;
+            z-index: 200;
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            color: rgba(255, 255, 255, 0.5);
+            padding: 6px 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: 0.2s;
+        }
+
+        #fullscreen-btn:hover {
+            background: rgba(255, 94, 98, 0.3);
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <div class="theme-tag">1.Tema: Sayılar ve Nicelikler (2)</div>
+        <h1>MAT.5.1.4 Kesirlerde Sıralama</h1>
+        <div class="subtitle">Kesirleri karşılaştırma, sıralama ve gerçek yaşamda yorumlama</div>
+    </header>
+
+    <div class="grid-wrapper">
+        <div class="grid-container">
+            <div class="game-card card-1" id="card-1" onclick="oyunAc('oyun1.html', 1)">
+                <span class="card-num">01</span>
+                <span class="card-icon">🏆</span>
+                <div class="card-title">Taraftar Ligi</div>
+                <div class="card-desc">Anket verilerini stadyumda görselleştir.</div>
+            </div>
+            <div class="game-card card-2" id="card-2" onclick="oyunAc('oyun2.html', 2)">
+                <span class="card-num">02</span>
+                <span class="card-icon">🌍</span>
+                <div class="card-title">Adil Paylaşım</div>
+                <div class="card-desc">Arazi miraslarını modelleyerek karşılaştır.</div>
+            </div>
+            <div class="game-card card-3" id="card-3" onclick="oyunAc('oyun3.html', 3)">
+                <span class="card-num">03</span>
+                <span class="card-icon">�</span>
+                <div class="card-title">Kesir Cambazı</div>
+                <div class="card-desc">Sayı doğrusunda 0, Yarım ve Tam'ı kullan.</div>
+            </div>
+            <div class="game-card card-4" id="card-4" onclick="oyunAc('oyun4.html', 4)">
+                <span class="card-num">04</span>
+                <span class="card-icon">🔬</span>
+                <div class="card-title">Sayı Mikroskobu</div>
+                <div class="card-desc">Ondalık sayıların yoğunluğunu keşfet.</div>
+            </div>
+            <div class="game-card card-5" id="card-5" onclick="oyunAc('oyun5.html', 5)">
+                <span class="card-num">05</span>
+                <span class="card-icon">🏷️</span>
+                <div class="card-title">Etiket Dedektifi</div>
+                <div class="card-desc">Birim fiyatları karşılaştır, tasarruf et.</div>
+            </div>
+            <div class="game-card card-6" id="card-6" onclick="oyunAc('oyun6.html', 6)">
+                <span class="card-num">06</span>
+                <span class="card-icon">♻️</span>
+                <div class="card-title">Yeşil Gelecek</div>
+                <div class="card-desc">TÜİK çevre verilerini analiz et.</div>
+            </div>
+        </div>
+
+        <!-- ŞİFRE PANELİ — grid-wrapper içinde, kartların hemen altında -->
+        <div class="password-panel">
+            <span style="font-family:'Orbitron'; font-size:0.9rem; color:#ff9f43; flex-shrink:0; left:200px;">GİZLİ
+                ŞİFRE:</span>
+            <div class="letter-box" id="box-1">?</div>
+            <div class="letter-box" id="box-2">?</div>
+            <div class="letter-box" id="box-3">?</div>
+            <div class="letter-box" id="box-4">?</div>
+            <div class="letter-box" id="box-5">?</div>
+            <div class="letter-box" id="box-6">?</div>
+            <div class="letter-box" id="box-7">?</div>
+            <div class="letter-box" id="box-8">?</div>
+        </div>
+    </div> <!-- grid-wrapper sonu -->
+
+    <!-- IFRAME OYUN ALANI -->
+    <div id="game-view">
+        <iframe id="game-frame" src="" title="Oyun"></iframe>
+    </div>
+
+    <!-- BAŞARI MODAL — mat10 stili, alt ortada -->
+    <div class="modal-overlay" id="successModal" onclick="this.style.display='none'">
+        <div class="pass-modal" onclick="event.stopPropagation()">
+            <span class="success-icon">🏆</span>
+            <h2>TEBRİKLER!</h2>
+            <p style="color:#aaa; margin-top:10px;">Tüm kesirleri karşılaştırdın ve sıraladın. Artık bir <b
+                    style="color:#FF9966;">Sıralama Uzmanısın!</b></p>
+            <button class="modal-close-btn" onclick="document.getElementById('successModal').style.display='none'">KAPAT
+                ✕</button>
+        </div>
+    </div>
+
+    <button id="fullscreen-btn" onclick="toggleFullScreen()">⛶</button>
+
+    <script>
+        // Şifre: SIRALAMA (8 harf: S-I-R-A-L-A-M-A)
+        const SIFRE = "SIRALAMA";
+        const HARF_MAP = { 1: "S", 2: "I", 3: "R", 4: "A", 5: "L", 6: "A", 7: "M", 8: "A" };
+        // Oyun 3 → "RA" demek → 2 karakter → box 3 ve 4
+        // Oyun 4 → "LA" → box 5 ve 6
+
+        const toplananHarfler = {};
+
+        function oyunAc(url, id) {
+            document.getElementById('game-view').classList.add('active');
+            document.getElementById('game-frame').src = url;
+        }
+
+        function oyunKapat() {
+            document.getElementById('game-view').classList.remove('active');
+            document.getElementById('game-frame').src = '';
+        }
+
+        // postMessage ile oyunlardan mesaj al
+        window.addEventListener('message', function (event) {
+            const data = event.data;
+            if (!data || !data.tip) return;
+
+            if (data.tip === 'MENUYE_DON') {
+                oyunKapat();
+            }
+
+            if (data.tip === 'GOREV_TAMAM') {
+                const id = data.id;
+                const harf = data.harf || '';
+
+                if (harf) {
+                    toplananHarfler[id] = harf;
+                    harfleriGuncelle(id, harf);
+                }
+
+                // Kartı tamamlandı olarak işaretle
+                const kart = document.getElementById('card-' + id);
+                if (kart) kart.classList.add('completed');
+                localStorage.setItem('mat4_card_' + id, 'done');
+
+                oyunKapat();
+            }
+        });
+
+        function harfleriGuncelle(oyunId, harf) {
+            const kutuMap = {
+                1: [1],
+                2: [2],
+                3: [3, 4],
+                4: [5, 6],
+                5: [7],
+                6: [8]
+            };
+            const kutular = kutuMap[oyunId] || [];
+            const harfler = Array.isArray(harf) ? harf : harf.split('');
+            kutular.forEach(function (boxNum, i) {
+                const box = document.getElementById('box-' + boxNum);
+                if (box && harfler[i]) {
+                    box.textContent = harfler[i];
+                    box.classList.add('active', 'reveal'); // mat10 standardı
+                }
+            });
+        }
+
+        function sifreKontrol() {
+            let toplanan = '';
+            for (let i = 1; i <= 8; i++) {
+                const box = document.getElementById('box-' + i);
+                const txt = (box && box.textContent) ? box.textContent.trim() : '';
+                toplanan += (txt === '?' ? '' : txt); // '?' placeholder sayılmaz
+            }
+            if (toplanan.toUpperCase() === SIFRE) {
+                document.getElementById('successModal').style.display = 'flex';
+            } else {
+                alert('şifre henüz tamamlanmadı! Oyunları bitirerek harfleri topla. (' + toplanan + ')');
+            }
+        }
+
+        // Kart durumu sadece oturumda tutulur (localStorage kaldırıldı)
+
+        // Tam ekran
+        function toggleFullScreen() {
+            if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(() => { });
+            else document.exitFullscreen();
+        }
+        document.addEventListener('fullscreenchange', function () {
+            document.getElementById('fullscreen-btn').innerText = document.fullscreenElement ? '↙' : '⛶';
+        });
+    </script>
+</body>
+
+</html>

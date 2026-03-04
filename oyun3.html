@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kesir Cambazı - Görev 3</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Rye&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: #87CEEB;
+            background-image: radial-gradient(circle at 50% 100%, #ffffff 10%, transparent 10%), linear-gradient(90deg, #ff9ff3 25%, #feca57 25%, #feca57 50%, #ff9ff3 50%, #ff9ff3 75%, #feca57 75%);
+            background-size: 100px 100px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(87, 101, 116, 0.92);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: #ffeaa7;
+        }
+
+        .hud-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #ffeaa7;
+            color: #333;
+        }
+
+        .btn-code {
+            border-color: #54a0ff;
+            color: #54a0ff;
+        }
+
+        .btn-code:hover {
+            background: #54a0ff;
+            color: #fff;
+        }
+
+        .circus-stage {
+            background: rgba(255, 255, 255, 0.92);
+            border: 5px solid #ff9f43;
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin-top: 55px;
+        }
+
+        .level-badge {
+            background: #ff9f43;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-weight: bold;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+
+        .question-box {
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 25px;
+            background: #c7ecee;
+            padding: 10px 30px;
+            border-radius: 10px;
+            border: 2px dashed #22a6b3;
+        }
+
+        .fraction-display {
+            font-size: 2.8rem;
+            font-family: 'Rye', serif;
+            color: #d35400;
+            display: block;
+            margin-top: 5px;
+        }
+
+        .rope-container {
+            position: relative;
+            width: 100%;
+            height: 140px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .tightrope {
+            position: absolute;
+            top: 70%;
+            left: 5%;
+            right: 5%;
+            height: 6px;
+            background: #8395a7;
+            border-radius: 3px;
+            z-index: 1;
+        }
+
+        .marker {
+            position: absolute;
+            top: 75%;
+            font-weight: bold;
+            color: #576574;
+            transform: translateX(-50%);
+            font-size: 1.2rem;
+        }
+
+        .m-0 {
+            left: 5%;
+        }
+
+        .m-half {
+            left: 50%;
+        }
+
+        .m-1 {
+            left: 95%;
+        }
+
+        .walker {
+            font-size: 3.5rem;
+            position: absolute;
+            top: 25%;
+            left: 5%;
+            transform: translateX(-50%);
+            z-index: 10;
+            transition: left 1s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+            filter: drop-shadow(0 5px 5px rgba(0, 0, 0, 0.3));
+        }
+
+        .walker.wobble {
+            animation: wobble 0.5s infinite ease-in-out;
+        }
+
+        @keyframes wobble {
+
+            0%,
+            100% {
+                transform: translateX(-50%) rotate(-5deg);
+            }
+
+            50% {
+                transform: translateX(-50%) rotate(5deg);
+            }
+        }
+
+        .zones {
+            position: absolute;
+            top: 0;
+            left: 5%;
+            right: 5%;
+            bottom: 0;
+            display: flex;
+            z-index: 5;
+        }
+
+        .zone {
+            flex: 1;
+            border: 2px dashed transparent;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 10px;
+            cursor: pointer;
+            transition: background 0.3s, border 0.3s;
+            border-radius: 10px;
+            font-weight: bold;
+            color: transparent;
+        }
+
+        .zone:hover {
+            background: rgba(255, 234, 167, 0.3);
+            border-color: #fdcb6e;
+            color: #e17055;
+        }
+
+        .zone span {
+            background: rgba(255, 255, 255, 0.8);
+            padding: 5px 10px;
+            border-radius: 10px;
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .secret-reveal {
+            border: 2px dashed #54a0ff;
+            padding: 15px;
+            border-radius: 10px;
+            background: #dff9fb;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .secret-letter-big {
+            font-size: 3.5rem;
+            color: #2e86de;
+            font-weight: bold;
+            font-family: 'Orbitron';
+            letter-spacing: 3px;
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #54a0ff;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Rye';
+            font-size: 1rem;
+        }
+
+        .discovery-area {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .discovery-bubble {
+            background: rgba(241, 196, 15, 0.9);
+            border-left: 4px solid #e67e22;
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: #333;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: center;
+            opacity: 0;
+            z-index: 50;
+            animation: bubbleFadeIn 0.8s ease forwards;
+        }
+
+        @keyframes bubbleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #10142b;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #c8d6e5;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #ff9f43;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #54a0ff;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #6e40c9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">🎪 KESİR CAMBAZI</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="circus-stage">
+        <div class="level-badge">GÖSTERİ: <span id="level-idx">1/5</span></div>
+        <div class="question-box">
+            Bu kesir nereye daha yakın?
+            <span class="fraction-display" id="frac-target">1/10</span>
+        </div>
+        <div class="rope-container">
+            <div class="tightrope"></div>
+            <div class="marker m-0">0</div>
+            <div class="marker m-half">1/2</div>
+            <div class="marker m-1">1</div>
+            <div class="walker" id="walker">🤹‍♂️</div>
+            <div class="zones">
+                <div class="zone" onclick="checkZone(0)"><span>0'a YAKIN</span></div>
+                <div class="zone" onclick="checkZone(0.5)"><span>YARIM'a YAKIN</span></div>
+                <div class="zone" onclick="checkZone(1)"><span>TAM'a YAKIN</span></div>
+            </div>
+        </div>
+        <p style="color:#636e72;font-size:0.9rem;">💡 İpucu: Cambazı düşürmemek için doğru bölgeyi seç!</p>
+        <div class="discovery-area" id="discoveryArea"></div>
+
+        <div class="feedback-overlay" id="feedback">
+            <h1 style="font-size:3.5rem;margin:0;">🎪</h1>
+            <h2 style="color:#54a0ff;" id="fb-title">MÜKEMMEL DENGE!</h2>
+            <p id="fb-msg">Kesrin yerini doğru tahmin ettin.</p>
+            <div class="secret-reveal" id="secret-reveal">
+                🔐 GİZLİ HECE:<br>
+                <span class="secret-letter-big">RA</span><br>
+                <small style="color:#666;">Bu iki harfi şifre paneline! (kutu 3 ve 4)</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SIRADAKİ GÖSTERİ ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#ff9f43;color:#2c3e50;"
+                onclick="gorevTamamla()">🏠 Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">🎪 GÖREV: KESİR CAMBAZI</h3>
+            <p><b style="color:#54a0ff;">MAT.5.1.4</b> — Referans noktalarıyla kesri yerleştir.</p>
+            <hr style="border-color:rgba(255,255,255,0.1);margin:15px 0;">
+            <p>📌 Gösterilen kesir 0'a mı, 1/2'ye mi, yoksa 1'e mi daha yakın?</p>
+            <p>💡 1/12 çok küçük (0'a yakın). 6/10, 5/10=1/2'ye yakın.</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: KESİR CAMBAZI</h3>
+            <p style="font-size:0.85rem;color:#aaa;">Cambaz animasyonunu CSS transition ile nasıl yaptım?</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="copy-btn" onclick="kopyala()" style="flex:1;">📋 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank"
+                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
+                    Talent14</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 3, harf: 'RA' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu3.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu3.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+        function showDiscovery(text) { document.getElementById('discoveryArea').innerHTML = `<div class="discovery-bubble">${text}</div>`; }
+
+        const levels = [
+            { txt: "1/12", target: 0, hint: "12 parçadan sadece 1 tanesi. Sıfıra çok yakın!" },
+            { txt: "6/10", target: 0.5, hint: "Yarısı 5/10 eder. 6/10, yarıma çok yakın." },
+            { txt: "9/10", target: 1, hint: "Tamamına (10/10) gelmesine çok az kalmış." },
+            { txt: "2/5", target: 0.5, hint: "5'in yarısı 2.5'tur. 2 buna çok yakın." },
+            { txt: "1/8", target: 0, hint: "8 parçadan sadece 1'i. Sıfıra çok yakın!" }
+        ];
+        const discoveries = [
+            "💡 0'a yakın kesirler: Pay çok küçük, payda çok büyük olunca. (1/12 gibi)",
+            "💡 1/2'ye yakın kesirler: Pay, paydanın kabaca yarısı. (6/10 ≈ 5/10)",
+            "💡 1'e yakın kesirler: Pay, paydaya çok yakın. (9/10, 10/10'dan 1 eksik)",
+            "💡 2/5: 5'in yarısı 2.5. 2 < 2.5 olduğu için 1/2'den biraz küçük!",
+            "💡 1/8 = 0.125. Sıfıra çok yakın. Pay küçük, payda büyük = Küçük kesir!"
+        ];
+        let currentIdx = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('level-idx').innerText = (currentIdx + 1) + '/' + levels.length;
+            document.getElementById('frac-target').innerText = d.txt;
+            document.getElementById('feedback').style.display = 'none';
+            const w = document.getElementById('walker'); w.style.left = '5%'; w.classList.remove('wobble');
+            if (currentIdx > 0) showDiscovery(discoveries[currentIdx - 1]);
+        }
+        function checkZone(zoneValue) {
+            const d = levels[currentIdx]; const w = document.getElementById('walker');
+            let tL = '5%';
+            if (zoneValue === 0) tL = '15%';
+            if (zoneValue === 0.5) tL = '50%';
+            if (zoneValue === 1) tL = '85%';
+            w.style.left = tL; w.classList.add('wobble');
+            setTimeout(() => {
+                w.classList.remove('wobble');
+                if (zoneValue === d.target) {
+                    const isLast = currentIdx === levels.length - 1;
+                    document.getElementById('fb-title').innerText = isLast ? 'SİRKİN YILDIZI!' : 'MÜKEMMEL DENGE!';
+                    document.getElementById('fb-msg').innerText = isLast ? 'Tüm kesirleri doğru yerleştirdin. İşte gizli hece:' : d.hint;
+                    document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                    document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                    document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                    document.getElementById('feedback').style.display = 'flex';
+                    if (isLast) showDiscovery(discoveries[4]);
+                } else {
+                    alert('Dikkat! Cambaz dengesini kaybediyor. ' + d.hint);
+                    w.style.left = '5%';
+                }
+            }, 1000);
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

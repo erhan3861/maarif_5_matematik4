@@ -1,0 +1,308 @@
+<!-- ============================================================
+   ⚽ TARAFTAR LİGİ - ÖĞRENCİ KODU
+   📌 Konu: Kesirleri Tribün Verisiyle Karşılaştırma
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — Farklı gösterimlerle kesirleri karşılaştırma
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Taraftar Ligi - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Çim desenli arka plan: İç içe ızgaralar */
+            background-color: #2ecc71;
+            background-image:
+                linear-gradient(rgba(0,0,0,0.1) 2px, transparent 2px),
+                linear-gradient(90deg, rgba(0,0,0,0.1) 2px, transparent 2px);
+            background-size: 50px 50px;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #fff;
+            overflow: hidden;
+        }
+
+        h2 { color: #f1c40f; text-shadow: 2px 2px 4px rgba(0,0,0,0.5); }
+
+        /* ===== STADYUM KUTUSU ===== */
+        .stadyum {
+            background: #2c3e50;           /* Koyu gri = stadyum */
+            border: 8px solid #ecf0f1;     /* Beyaz çerçeve */
+            border-radius: 40px;           /* Oval köşeler */
+            padding: 20px;
+            width: 90%;
+            max-width: 600px;
+            /* box-shadow = Derinlik hissi */
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* ===== SKOR TABELASI ===== */
+        .skor-tabelasi {
+            background: #000;              /* Siyah ekran */
+            color: #ff0000;               /* LED kırmızı */
+            font-family: 'Courier New', monospace;  /* Dijital yazı tipi */
+            width: 80%;
+            padding: 10px;
+            /* border: Çok katmanlı çerçeve */
+            border: 4px solid #555;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+            font-size: 1.5rem;
+            /* text-shadow = Neon parıltı efekti */
+            text-shadow: 0 0 10px red;
+            display: flex;
+            justify-content: space-around;
+        }
+
+        /* ===== TRİBÜN (KOLTUK IZGARASI) ===== */
+        .tribun {
+            display: grid;
+            /* 10 eşit sütun */
+            grid-template-columns: repeat(10, 1fr);
+            gap: 5px;
+            background: #34495e;           /* Koyu arka plan */
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Her koltuk = Bir kutu */
+        .koltuk {
+            width: 24px;
+            height: 24px;
+            background: #7f8c8d;           /* Gri = Boş koltuk */
+            border-radius: 5px;
+            transition: transform 0.3s;    /* Zıplama geçişi */
+        }
+        /* .red = Kırmızı taraftar koltuğu */
+        .koltuk.red {
+            background: #e74c3c;
+            box-shadow: 0 0 5px #c0392b;
+            /* animation = Zıplama animasyonu (cheer) */
+            animation: cheer 0.5s infinite alternate;
+        }
+        /* .blue = Mavi taraftar koltuğu */
+        .koltuk.blue {
+            background: #3498db;
+            box-shadow: 0 0 5px #2980b9;
+            animation: cheer 0.6s infinite alternate-reverse;
+        }
+
+        /* @keyframes = Animasyon adımlarını tanımlar */
+        @keyframes cheer {
+            from { transform: translateY(0); }      /* Başlangıç: yukarıda */
+            to   { transform: translateY(-3px); }   /* Bitiş: aşağıda */
+        }
+
+        /* ===== SEÇIM BUTONLARI ===== */
+        .butonlar {
+            display: flex;
+            gap: 15px;
+            align-items: center;
+        }
+
+        .takim-btn {
+            padding: 14px 25px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s;
+            /* Alt kenara kalın gölge = 3D buton efekti */
+            box-shadow: 0 5px 0 rgba(0,0,0,0.3);
+            min-width: 130px;
+            font-weight: bold;
+        }
+
+        .btn-kirmizi { background: #e74c3c; }
+        .btn-mavi    { background: #3498db; }
+        .btn-esit    { background: #f1c40f; color: #2c3e50; }
+
+        /* :active = Butona basılınca tetiklenir */
+        .takim-btn:active {
+            transform: translateY(4px);        /* Aşağı kayar */
+            box-shadow: 0 1px 0 rgba(0,0,0,0.3);   /* Gölge küçülür */
+        }
+    </style>
+</head>
+<body>
+    <h2>⚽ Taraftar Ligi</h2>
+
+    <div class="stadyum">
+        <!-- LED Skor Tabelası -->
+        <div class="skor-tabelasi">
+            <span style="color:#e74c3c;">KIRMIZI</span>
+            <span id="mac">MAÇ 1</span>
+            <span style="color:#3498db;">MAVİ</span>
+        </div>
+
+        <p style="color:#ecf0f1; margin-bottom:10px;">
+            Hangi renk daha fazla koltuk kaplıyor?
+        </p>
+
+        <!-- Koltuk ızgarası: JS ile doldurulacak -->
+        <div class="tribun" id="tribun"></div>
+
+        <!-- Seçim butonları -->
+        <div class="butonlar">
+            <button class="takim-btn btn-kirmizi" onclick="secimYap('red')">
+                KIRMIZI<br>
+                <span id="k-kesir" style="font-size:0.75rem;">—</span>
+            </button>
+            <button class="takim-btn btn-esit" onclick="secimYap('equal')">
+                EŞİT =
+            </button>
+            <button class="takim-btn btn-mavi" onclick="secimYap('blue')">
+                MAVİ<br>
+                <span id="m-kesir" style="font-size:0.75rem;">—</span>
+            </button>
+        </div>
+
+        <div id="mesaj" style="margin-top:12px;font-size:0.9rem;min-height:20px;text-align:center;"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: MAÇ VERİLERİ
+    // ============================================================
+
+    // Her nesne bir maçı (seviyeyi) temsil eder:
+    //   kText  = Kırmızı taraftarın kesri (ekranda görünür)
+    //   kDeger = Kırmızı taraftarın gerçek sayısal değeri (50 koltuktaki adedi)
+    //   mText  = Mavi taraftarın kesri (ekranda görünür)
+    //   mDeger = Mavi taraftarın gerçek sayısal değeri
+    //
+    // 💡 KARŞILAŞTIRMA MANTIĞI:
+    //   50 koltukta 10 kırmızı = 10/50 = 1/5 = %20
+    //   50 koltukta 25 mavi    = 25/50 = 1/2 = %50
+    //   → Mavi > Kırmızı!
+    const maclar = [
+        { kText: "10/50", kDeger: 10, mText: "25/50", mDeger: 25 },
+        { kText: "1/2",   kDeger: 25, mText: "1/5",   mDeger: 10 },
+        { kText: "20/50", kDeger: 20, mText: "4/10",  mDeger: 20 },
+        { kText: "3/10",  kDeger: 15, mText: "1/2",   mDeger: 25 }
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutMac = 0;       // Hangi maçtayız? (0'dan başlar)
+    const TOPLAM_KOLTUK = 50; // Tribündeki toplam koltuk sayısı
+
+    window.onload = function() { macYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: MAÇ YÜKLEME
+    // ============================================================
+
+    function macYukle() {
+        if (mevcutMac >= maclar.length) {
+            document.querySelector('.stadyum').innerHTML =
+                '<h2 style="color:#f1c40f;">🏆 ŞAMPİYON!</h2>' +
+                '<p>Tüm maçları doğru analiz ettin!</p>';
+            return;
+        }
+        const m = maclar[mevcutMac];
+        document.getElementById('mac').innerText      = 'MAÇ ' + (mevcutMac + 1);
+        document.getElementById('k-kesir').innerText  = m.kText;
+        document.getElementById('m-kesir').innerText  = m.mText;
+        document.getElementById('mesaj').innerText    = '';
+        koltukCiz(m.kDeger, m.mDeger);
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: KOLTUK ÇİZME
+    // ============================================================
+
+    function koltukCiz(kirmizi, mavi) {
+        const tribun = document.getElementById('tribun');
+        tribun.innerHTML = '';   // Önceki koltuklaru temizle
+
+        // Dizi oluştur: kırmızılar + maviler + boşlar
+        let koltuklar = [];
+        for (let i = 0; i < kirmizi; i++) koltuklar.push('red');
+        for (let i = 0; i < mavi; i++)    koltuklar.push('blue');
+        const bos = TOPLAM_KOLTUK - kirmizi - mavi;
+        for (let i = 0; i < bos; i++)     koltuklar.push('empty');
+
+        // Her koltuk için div oluştur (forEach = dizi döngüsü)
+        koltuklar.forEach(function(tip) {
+            const div = document.createElement('div');
+            // Template literal: Değişkeni string içine göm
+            // 'koltuk' + tip → 'koltuk red' veya 'koltuk blue'
+            div.className = 'koltuk ' + tip;
+            tribun.appendChild(div);
+        });
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 5: SEÇİM KONTROLÜ
+    // ============================================================
+
+    function secimYap(secilen) {
+        const m = maclar[mevcutMac];
+        // Doğru cevabı hesapla
+        let dogru = '';
+        if      (m.kDeger > m.mDeger) dogru = 'red';
+        else if (m.mDeger > m.kDeger) dogru = 'blue';
+        else                           dogru = 'equal';
+
+        const mesaj = document.getElementById('mesaj');
+        if (secilen === dogru) {
+            // ✅ Doğru!
+            mesaj.innerText = '⚽ GOOOL! +1 Puan';
+            mesaj.style.color = '#2ecc71';
+            setTimeout(function() { mevcutMac++; macYukle(); }, 1500);
+        } else {
+            // ❌ Yanlış
+            alert('Yanlış Tahmin! Koltuklara ve kesirlere dikkatli bak.');
+        }
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Koltuk boyutunu büyüt
+→ .koltuk { width: 24px; height: 24px; } satırını bul
+→ 24px yerine 20px yaz (Tribün küçülecek ama daha net görünecek)
+
+GÖREV 2 (Kolay): Kırmızı koltukların rengini turuncu yap
+→ .koltuk.red { background: #e74c3c; } satırını bul
+→ #e74c3c yerine #e67e22 (turuncu) yaz
+
+GÖREV 3 (Orta): Yeni bir maç ekle
+→ const maclar = [ ... ]; dizisini bul
+→ son '}' den sonra virgül koy ve ekle:
+   , { kText: "30/50", kDeger: 30, mText: "2/5", mDeger: 20 }
+→ 30/50 = 3/5 = 0.6 ve 2/5 = 20/50 = 0.4 → Kırmızı kazanır!
+
+GÖREV 4 (Zor): Puan sayacı ekle
+→ let puan = 0; değişkenini BÖLÜM 2'ye ekle
+→ secimYap() içinde doğru (✅) kısma ekle:
+   puan++;
+   mesaj.innerText = '⚽ GOOOL! Toplam Puan: ' + puan;
+→ Kaç doğru yaptığını sayacak!
+
+============================================================ -->

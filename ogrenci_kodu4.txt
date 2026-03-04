@@ -1,0 +1,340 @@
+<!-- ============================================================
+   🔬 SAYI MİKROSKOBU - ÖĞRENCİ KODU
+   📌 Konu: Ondalık Sayıları Sayı Doğrusunda Konumlandırma
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — Ondalık basamak karşılaştırması ve sayı doğrusu
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Sayı Mikroskobu - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Koyu lacivert: laboratuvar teması */
+            background: #0a0a1e;
+            /* İnce mavi ızgara çizgileri */
+            background-image:
+                linear-gradient(rgba(0,168,255,0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,168,255,0.05) 1px, transparent 1px);
+            background-size: 30px 30px;
+            height: 100vh;
+            font-family: 'Courier New', monospace;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        h2 { color: #00a8ff; /* Neon mavi */
+             /* text-shadow = Neon parlama efekti */
+             text-shadow: 0 0 10px #00a8ff; }
+
+        /* ===== MİKROSKOP KUTUSU ===== */
+        .mikroskop {
+            background: rgba(0,20,40,0.9);
+            border: 2px solid rgba(0,168,255,0.4);
+            border-radius: 18px;
+            padding: 25px;
+            width: 90%;
+            max-width: 620px;
+            /* box-shadow = Dışa mavi parıltı */
+            box-shadow: 0 0 30px rgba(0,168,255,0.1);
+            text-align: center;
+        }
+
+        /* ===== ODAK (HEDEF SAYI) ===== */
+        .odak {
+            margin-bottom: 20px;
+        }
+        .odak-etiket {
+            font-size: 0.8rem;
+            color: #aaa;
+            letter-spacing: 2px;
+            display: block;
+            margin-bottom: 8px;
+        }
+        /* Büyük sayı gösterimi */
+        .odak-sayi {
+            font-size: 3rem;
+            font-weight: bold;
+            color: #ff9f43;              /* Turuncu */
+            /* text-shadow = Turuncu neon parıltı */
+            text-shadow: 0 0 15px #ff9f43;
+        }
+
+        /* ===== SAYI DOĞRUSU ALANI ===== */
+        .dogru-alani {
+            position: relative;          /* İçindeki öğeler bu kutuya göre konumlanır */
+            height: 90px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+        }
+
+        /* Yatay çizgi (sayı doğrusu) */
+        .dogru-cizgi {
+            position: absolute;
+            width: 90%;
+            height: 4px;
+            left: 5%;
+            /* Gradient: Soldan sağa soluk→parlak→soluk */
+            background: linear-gradient(
+                90deg,
+                rgba(0,168,255,0.2),
+                rgba(0,168,255,0.8),
+                rgba(0,168,255,0.2)
+            );
+            border-radius: 2px;
+        }
+
+        /* Sol ve sağ referans değerleri */
+        .sayi-etiketi {
+            position: absolute;
+            top: 30%;
+            font-size: 0.75rem;
+            color: #00a8ff;
+            /* transform kullanarak etiketi ortala */
+            transform: translateX(-50%);
+            font-weight: bold;
+        }
+        .sol-etiket { left: 5%; }
+        .sag-etiket { left: 95%; }
+
+        /* Turuncu nokta: Hedef sayının konumu */
+        .hedef-nokta {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #ff9f43;
+            border-radius: 50%;          /* Daire */
+            border: 3px solid #fff;
+            /* box-shadow = Neon parıltı */
+            box-shadow: 0 0 12px #ff9f43;
+            top: 50%;
+            /* transform: translate(-50%,-50%) = Tam ortaya hizala */
+            transform: translate(-50%, -50%);
+            /* transition = Pozisyon değişince animasyon */
+            transition: left 0.5s ease;
+        }
+
+        /* ===== SEÇİM KARTLARI ===== */
+        .secenekler {
+            display: grid;
+            /* 2 sütunlu ızgara */
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .secenek {
+            background: rgba(0,168,255,0.05);
+            border: 1px solid rgba(0,168,255,0.2);
+            border-radius: 10px;
+            padding: 12px;
+            cursor: pointer;
+            /* transition = Hover geçişi */
+            transition: all 0.2s;
+            font-size: 0.95rem;
+            color: #e0e0e0;
+        }
+
+        /* :hover = Üzerine gelince vurgula */
+        .secenek:hover {
+            background: rgba(0,168,255,0.15);
+            border-color: #00a8ff;
+            /* translateY = Yukarı kaldır (zıplama etkisi) */
+            transform: translateY(-3px);
+        }
+
+        .mesaj { margin-top: 15px; font-size: 0.9rem; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>🔬 Sayı Mikroskobu</h2>
+
+    <div class="mikroskop">
+        <div class="odak">
+            <span class="odak-etiket">ODAKLAN:</span>
+            <span class="odak-sayi" id="hedef-sayi">—</span>
+            <div style="color:#aaa; font-size:0.8rem; margin-top:5px;">
+                Bu sayı hangi aralıkta?
+            </div>
+        </div>
+
+        <!-- Sayı doğrusu -->
+        <div class="dogru-alani">
+            <div class="dogru-cizgi"></div>
+            <span class="sayi-etiketi sol-etiket" id="sol-etiket">?</span>
+            <span class="sayi-etiketi sag-etiket" id="sag-etiket">?</span>
+            <!-- Turuncu nokta: Sayının konumunu gösterir -->
+            <div class="hedef-nokta" id="hedef-nokta" style="left:50%"></div>
+        </div>
+
+        <!-- Aralık seçenekleri (JS ile doldurulacak) -->
+        <div class="secenekler" id="secenekAlan"></div>
+
+        <div class="mesaj" id="mesaj"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: SORU VERİLERİ
+    // ============================================================
+
+    // Her nesne bir soruyu temsil eder:
+    //   sayi    = Ekranda gösterilen ondalık sayı
+    //   deger   = Sayısal değer (nokta pozisyonu için)
+    //   sol     = Sayı doğrusunun sol referans değeri
+    //   sag     = Sayı doğrusunun sağ referans değeri
+    //   dogru   = Doğru aralık cevabı (string)
+    //   secenekler = 4 seçenek (biri doğru)
+    //   ipucu   = Yanlış cevapta gösterilecek açıklama
+    //
+    // 💡 BASAMAK TUZAĞI:
+    //   45,90 ≠ 45,09!!
+    //   45,90 = 45 tam 90 yüzde = büyük
+    //   45,09 = 45 tam 09 yüzde = küçük
+    const sorular = [
+        {
+            sayi: "24,25", deger: 24.25,
+            sol: 24.0, sag: 24.5,
+            dogru: "24,0 – 24,5",
+            secenekler: ["24,0 – 24,5", "24,5 – 25,0", "23,0 – 24,0", "25,0 – 26,0"],
+            ipucu: "24,25 sayısı 24,0 ile 24,5 arasında yer alır."
+        },
+        {
+            sayi: "45,09", deger: 45.09,
+            sol: 45.0, sag: 45.1,
+            dogru: "45,0 – 45,1",
+            secenekler: ["45,9 – 46,0", "45,0 – 45,1", "45,5 – 45,9", "44,0 – 45,0"],
+            ipucu: "TUZAK! 45,09 < 45,10. Yani 45,0 ile 45,1 arasındadır!"
+        },
+        {
+            sayi: "11,99", deger: 11.99,
+            sol: 11.9, sag: 12.0,
+            dogru: "11,9 – 12,0",
+            secenekler: ["11,0 – 11,9", "11,9 – 12,0", "12,0 – 12,1", "10,0 – 11,0"],
+            ipucu: "11,99 tam 12,00'dan sadece 0,01 küçük!"
+        }
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutIdx = 0;
+
+    window.onload = function() { soruYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: SORU YÜKLEME
+    // ============================================================
+
+    function soruYukle() {
+        if (mevcutIdx >= sorular.length) {
+            document.querySelector('.mikroskop').innerHTML =
+                '<h2 style="color:#00a8ff;">🔬 MİKROSKOP USTASI!</h2>' +
+                '<p>Tüm ondalık sayıları doğru analiz ettin!</p>';
+            return;
+        }
+
+        const s = sorular[mevcutIdx];
+        document.getElementById('hedef-sayi').innerText = s.sayi;
+        document.getElementById('sol-etiket').innerText = String(s.sol).replace('.', ',');
+        document.getElementById('sag-etiket').innerText = String(s.sag).replace('.', ',');
+        document.getElementById('mesaj').innerText = '';
+
+        // Turuncu noktanın pozisyonu:
+        // (deger - sol) / (sag - sol) → 0 ile 1 arasında bir oran
+        // 5% + 90% × oran → Ekran yüzdesi
+        const oran = (s.deger - s.sol) / (s.sag - s.sol);
+        const yuzde = 5 + 90 * oran;
+        document.getElementById('hedef-nokta').style.left = yuzde + '%';
+
+        secenek_olustur(s);
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: SEÇENEKLERİ OLUŞTUR
+    // ============================================================
+
+    function secenek_olustur(s) {
+        const alan = document.getElementById('secenekAlan');
+        alan.innerHTML = '';  // Önceki seçenekleri temizle
+
+        // sort() ile seçenekleri karıştır: Math.random() - 0.5
+        // Math.random() → 0-1 arası rastgele
+        // - 0.5 → Bazen negatif bazen pozitif → Rastgele sıralama!
+        const karisik = [...s.secenekler].sort(() => Math.random() - 0.5);
+
+        // forEach = Dizinin her elemanı için fonksiyon çalıştır
+        karisik.forEach(function(secim) {
+            const div = document.createElement('div');
+            div.className = 'secenek';
+            div.innerText = secim;
+            // Arrow function: (Kısa fonksiyon yazımı)
+            div.onclick = () => cevapla(secim, s);
+            alan.appendChild(div);
+        });
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 5: CEVAP KONTROLÜ
+    // ============================================================
+
+    function cevapla(secim, s) {
+        const mesaj = document.getElementById('mesaj');
+        if (secim === s.dogru) {
+            // ✅ Doğru!
+            mesaj.innerText = '✅ ' + s.ipucu;
+            mesaj.style.color = '#2ecc71';
+            setTimeout(function() { mevcutIdx++; soruYukle(); }, 2000);
+        } else {
+            // ❌ Yanlış
+            alert('Yanlış aralık!\n\n💡 ' + s.ipucu);
+        }
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Arka plan ızgara boyutunu değiştir
+→ background-size: 30px 30px; satırını bul
+→ 30px yerine 60px yaz
+→ Arka plan çizgileri daha seyrek görünecek!
+
+GÖREV 2 (Kolay): Turuncu noktanın rengini değiştir
+→ .hedef-nokta { background: #ff9f43; } satırını bul
+→ #ff9f43 yerine #00e676 (neon yeşil) yaz
+→ box-shadow içinde de #ff9f43 → #00e676 değiştir
+
+GÖREV 3 (Orta): Seçenek sayısını 4'ten 3'e düşür
+→ Soru verilerinde her secenek dizisini 3 elemana indirgemeli
+   Örnek: ["24,0 – 24,5", "24,5 – 25,0", "23,0 – 24,0"]
+→ .secenekler { grid-template-columns: repeat(2, 1fr); } satırını bul
+→ repeat(2, 1fr) yerine repeat(3, 1fr) yaz (3 sütun = 3 kart yan yana)
+
+GÖREV 4 (Zor): Puan sistemi ekle
+→ let puan = 0; değişkenini BÖLÜM 2'ye ekle
+→ h2 etiketinin id'sini ekle: <h2 id="puan-goster">🔬 ...
+→ cevapla() fonksiyonunda doğruysa:
+   puan++;
+   document.getElementById('puan-goster').innerText =
+       '🔬 Sayı Mikroskobu | Puan: ' + puan;
+
+============================================================ -->

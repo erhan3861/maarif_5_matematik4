@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Etiket Dedektifi - Görev 5</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Righteous&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background-color: #f5f6fa;
+            background-image: linear-gradient(45deg, #dcdde1 25%, transparent 25%, transparent 75%, #dcdde1 75%, #dcdde1), linear-gradient(45deg, #dcdde1 25%, transparent 25%, transparent 75%, #dcdde1 75%, #dcdde1);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #2f3640;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(47, 54, 64, 0.95);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: #fbc531;
+        }
+
+        .hud-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #fbc531;
+            color: #2f3640;
+        }
+
+        .btn-code {
+            border-color: #00a8ff;
+            color: #00a8ff;
+        }
+
+        .btn-code:hover {
+            background: #00a8ff;
+            color: #fff;
+        }
+
+        .aisle-container {
+            width: 90%;
+            max-width: 900px;
+            height: 72vh;
+            background: #fff;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            border: 5px solid #353b48;
+            margin-top: 55px;
+        }
+
+        .aisle-header {
+            background: #e84118;
+            color: white;
+            width: 100%;
+            padding: 12px;
+            text-align: center;
+            font-family: 'Righteous', cursive;
+            font-size: 1.4rem;
+            border-bottom: 5px solid #c23616;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-sizing: border-box;
+        }
+
+        .savings-box {
+            background: #4cd137;
+            padding: 4px 15px;
+            border-radius: 10px;
+            font-size: 0.9rem;
+        }
+
+        .shelf-area {
+            flex: 1;
+            width: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            padding-bottom: 50px;
+            background: linear-gradient(to bottom, #f5f6fa 80%, #dcdde1 100%);
+            position: relative;
+        }
+
+        .shelf-board {
+            position: absolute;
+            bottom: 40px;
+            width: 90%;
+            height: 20px;
+            background: #e1b12c;
+            border-radius: 5px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+            z-index: 1;
+        }
+
+        .products-wrapper {
+            display: flex;
+            gap: 50px;
+            z-index: 2;
+            margin-bottom: 20px;
+        }
+
+        .product-card {
+            background: white;
+            padding: 15px;
+            border-radius: 15px;
+            width: 210px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s;
+            position: relative;
+            border: 1px solid #ddd;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .product-card:hover {
+            transform: scale(1.05) translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.2);
+            border-color: #00a8ff;
+        }
+
+        .p-image {
+            font-size: 4.5rem;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .p-name {
+            font-weight: 900;
+            font-size: 1.1rem;
+            color: #2f3640;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .price-tag {
+            background: #fbc531;
+            color: #2f3640;
+            padding: 10px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            border-radius: 5px;
+            border: 2px dashed #2f3640;
+            position: relative;
+            display: inline-block;
+            transform: rotate(-2deg);
+        }
+
+        .price-tag::after {
+            content: 'TL';
+            font-size: 0.8rem;
+            vertical-align: super;
+        }
+
+        .barcode {
+            height: 10px;
+            width: 80%;
+            background: repeating-linear-gradient(90deg, #333 0, #333 2px, transparent 2px, transparent 4px);
+            margin: 10px auto 0;
+            opacity: 0.5;
+        }
+
+        .instruction {
+            position: absolute;
+            top: 75px;
+            font-size: 1.2rem;
+            color: #7f8fa6;
+            background: rgba(255, 255, 255, 0.9);
+            padding: 10px 20px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(47, 54, 64, 0.97);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 20px;
+            text-align: center;
+        }
+
+        .secret-reveal {
+            border: 3px dashed #e84118;
+            padding: 20px;
+            border-radius: 15px;
+            background: #fff;
+            margin-top: 20px;
+            display: none;
+            color: #2f3640;
+        }
+
+        .secret-letter-big {
+            font-size: 3.5rem;
+            color: #e84118;
+            font-weight: 900;
+            font-family: 'Orbitron';
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #e84118;
+            color: white;
+            border: none;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Righteous';
+            font-size: 1rem;
+            box-shadow: 0 5px 0 #c23616;
+        }
+
+        .next-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #10142b;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #c8d6e5;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #ee5253;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #fbc531;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #6e40c9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">🏷️ ETİKET DEDEKTİFİ</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="aisle-container">
+        <div class="aisle-header">
+            <span>REYON <span id="level-idx">1/5</span></span>
+            <div class="savings-box">💰 TASARRUF: <span id="savings-score">0,00</span> TL</div>
+        </div>
+        <div class="instruction">Hangisi daha ekonomik (ucuz)?</div>
+        <div class="shelf-area">
+            <div class="products-wrapper" id="products-area"></div>
+            <div class="shelf-board"></div>
+        </div>
+        <div class="feedback-overlay" id="feedback">
+            <div style="font-size:4rem;" id="fb-icon">💰</div>
+            <h2 style="color:#fbc531;" id="fb-title">TASARRUF ETTİN!</h2>
+            <p id="fb-msg" style="color:#fff;font-size:1.1rem;">Bütçeni korudun.</p>
+            <div class="secret-reveal" id="secret-reveal">
+                🔐 GİZLİ HARF:<br>
+                <span class="secret-letter-big">M</span><br>
+                <small style="color:#666;">Bu harfi şifre panelinde kullan!</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SIRADAKİ ÜRÜN ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#2ecc71;" onclick="gorevTamamla()">🏠
+                Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">🏷️ GÖREV: ETİKET DEDEKTİFİ</h3>
+            <p><b style="color:#fbc531;">MAT.5.1.4</b> — Ondalıkları karşılaştır, tasarruf et.</p>
+            <hr style="border-color:rgba(255,255,255,0.1);margin:15px 0;">
+            <p>📌 Rafta iki ürün var. Daha ucuz olanını tıkla!</p>
+            <p>💡 TUZAK: 45,90 TL &gt; 45,09 TL. Basamak değerlerine dikkat!</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: ETİKET DEDEKTİFİ</h3>
+            <p style="font-size:0.85rem;color:#aaa;">Ürün kartlarını JavaScript ile nasıl oluşturduk?</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="copy-btn" onclick="kopyala()" style="flex:1;">📋 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank"
+                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
+                    Talent14</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 5, harf: 'M' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu5.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu5.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+
+        const levels = [
+            { name: "Süt (1L)", emoji: "🥛", items: [{ id: 1, price: 24.50, brand: "Marka A" }, { id: 2, price: 24.25, brand: "Marka B" }] },
+            { name: "Pirinç (1kg)", emoji: "🍚", items: [{ id: 1, price: 45.90, brand: "Lüks" }, { id: 2, price: 45.09, brand: "Eko" }] },
+            { name: "Şampuan", emoji: "🧴", items: [{ id: 1, price: 85.50, brand: "Parlak" }, { id: 2, price: 85.55, brand: "İpek" }] },
+            { name: "Çikolata", emoji: "🍫", items: [{ id: 1, price: 12.00, brand: "Tam" }, { id: 2, price: 11.99, brand: "Fırsat" }] },
+            { name: "Defter", emoji: "📓", items: [{ id: 1, price: 30.15, brand: "Okul" }, { id: 2, price: 30.10, brand: "Not" }] }
+        ];
+        let currentIdx = 0, totalSavings = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('level-idx').innerText = (currentIdx + 1) + '/' + levels.length;
+            document.getElementById('feedback').style.display = 'none';
+            const c = document.getElementById('products-area'); c.innerHTML = '';
+            let items = [...d.items].sort(() => Math.random() - 0.5);
+            items.forEach(item => {
+                const card = document.createElement('div');
+                card.className = 'product-card';
+                card.onclick = () => checkPrice(item, items);
+                card.innerHTML = `<span class="p-image">${d.emoji}</span><span class="p-name">${d.name}<br><small style="color:#aaa">${item.brand}</small></span><div class="price-tag">${item.price.toFixed(2)}</div><div class="barcode"></div>`;
+                c.appendChild(card);
+            });
+        }
+        function checkPrice(selected, allItems) {
+            const cheapest = allItems.reduce((prev, curr) => prev.price < curr.price ? prev : curr);
+            if (selected.id === cheapest.id) {
+                const expensive = allItems.find(i => i.id !== selected.id);
+                const saved = expensive.price - selected.price;
+                totalSavings += saved;
+                document.getElementById('savings-score').innerText = totalSavings.toFixed(2).replace('.', ',');
+                const isLast = currentIdx === levels.length - 1;
+                document.getElementById('fb-title').innerText = isLast ? 'BİLİNÇLİ TÜKETİCİ!' : 'TASARRUF ETTİN!';
+                document.getElementById('fb-msg').innerHTML = isLast ? `Toplam Tasarruf: <b>${totalSavings.toFixed(2)} TL</b>. İşte gizli harf:` : `Harika! ${saved.toFixed(2)} TL cebinde kaldı.`;
+                document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                document.getElementById('feedback').style.display = 'flex';
+            } else {
+                alert(`Daha uygunu vardı! ${selected.price} > ${cheapest.price}. Dikkatli bak.`);
+            }
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

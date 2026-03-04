@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sayı Mikroskobu - Görev 4</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Righteous&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Fredoka', sans-serif;
+            background: #0a0a1a;
+            background-image: linear-gradient(rgba(0, 168, 255, 0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 168, 255, 0.04) 1px, transparent 1px);
+            background-size: 30px 30px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(10, 15, 30, 0.95);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 168, 255, 0.3);
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: #00a8ff;
+        }
+
+        .hud-btn {
+            background: rgba(0, 168, 255, 0.08);
+            border: 1px solid rgba(0, 168, 255, 0.3);
+            color: #00a8ff;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #00a8ff;
+            color: #000;
+        }
+
+        .btn-code {
+            border-color: #6c5ce7;
+            color: #6c5ce7;
+        }
+
+        .btn-code:hover {
+            background: #6c5ce7;
+            color: #fff;
+        }
+
+        .microscope {
+            background: rgba(0, 20, 40, 0.9);
+            border: 2px solid rgba(0, 168, 255, 0.4);
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 750px;
+            box-shadow: 0 0 40px rgba(0, 168, 255, 0.1);
+            position: relative;
+            margin-top: 55px;
+        }
+
+        .scope-header {
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 168, 255, 0.2);
+            padding-bottom: 12px;
+            margin-bottom: 20px;
+        }
+
+        .scope-title {
+            font-family: 'Orbitron';
+            color: #00a8ff;
+            font-size: 1rem;
+            text-shadow: 0 0 10px #00a8ff;
+        }
+
+        .scope-level {
+            color: #aaa;
+            font-size: 0.85rem;
+            margin-top: 4px;
+        }
+
+        .number-line-area {
+            position: relative;
+            height: 120px;
+            margin: 20px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .number-line {
+            position: absolute;
+            width: 90%;
+            height: 4px;
+            background: linear-gradient(90deg, rgba(0, 168, 255, 0.2), rgba(0, 168, 255, 0.8), rgba(0, 168, 255, 0.2));
+            border-radius: 2px;
+        }
+
+        .tick {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tick-line {
+            width: 2px;
+            height: 16px;
+            background: rgba(0, 168, 255, 0.6);
+        }
+
+        .tick-label {
+            font-family: 'Orbitron';
+            font-size: 0.7rem;
+            color: #00a8ff;
+            white-space: nowrap;
+        }
+
+        .target-dot {
+            position: absolute;
+            width: 18px;
+            height: 18px;
+            background: #ff9f43;
+            border-radius: 50%;
+            border: 3px solid #fff;
+            box-shadow: 0 0 12px #ff9f43;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            transition: left 0.5s ease;
+        }
+
+        .question-area {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .q-label {
+            font-size: 0.85rem;
+            color: #aaa;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .q-fraction {
+            font-family: 'Orbitron';
+            font-size: 2.5rem;
+            color: #ff9f43;
+            text-shadow: 0 0 15px #ff9f43;
+        }
+
+        .choices-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .choice-card {
+            background: rgba(0, 168, 255, 0.05);
+            border: 1px solid rgba(0, 168, 255, 0.2);
+            border-radius: 10px;
+            padding: 12px 6px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Orbitron';
+            font-size: 1rem;
+        }
+
+        .choice-card:hover {
+            background: rgba(0, 168, 255, 0.15);
+            border-color: #00a8ff;
+            transform: translateY(-3px);
+            box-shadow: 0 0 15px rgba(0, 168, 255, 0.2);
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 5, 15, 0.96);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        .secret-reveal {
+            border: 2px dashed #00a8ff;
+            padding: 15px;
+            border-radius: 10px;
+            background: rgba(0, 168, 255, 0.05);
+            margin-top: 15px;
+            display: none;
+        }
+
+        .secret-letter-big {
+            font-size: 3.5rem;
+            color: #00a8ff;
+            font-weight: bold;
+            font-family: 'Orbitron';
+            letter-spacing: 3px;
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #00a8ff;
+            color: #000;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Righteous';
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #0d1530;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #c8d6e5;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #00a8ff;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #00a8ff;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #0a0a1a;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #6e40c9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">🔬 SAYI MİKROSKOBU</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="microscope">
+        <div class="scope-header">
+            <div class="scope-title">🔬 SAYISAL ANALİZ</div>
+            <div class="scope-level">SEVİYE: <span id="level-idx">1/5</span> | Ondalıkları mikroskop altına al!</div>
+        </div>
+
+        <div class="question-area">
+            <div class="q-label">ODAKLAN:</div>
+            <div class="q-fraction" id="q-frac">—</div>
+            <div style="color:#aaa;font-size:0.85rem;margin-top:5px;">Bu sayı sayı doğrusunda hangi değer aralığında?
+            </div>
+        </div>
+
+        <div class="number-line-area">
+            <div class="number-line"></div>
+            <div class="tick" id="tick-left" style="left:5%;transform:translateX(-50%)">
+                <div class="tick-line"></div>
+                <div class="tick-label" id="label-left">?</div>
+            </div>
+            <div class="tick" id="tick-right" style="left:95%;transform:translateX(-50%)">
+                <div class="tick-line"></div>
+                <div class="tick-label" id="label-right">?</div>
+            </div>
+            <div class="target-dot" id="target-dot" style="left:50%"></div>
+        </div>
+
+        <div class="choices-grid" id="choicesGrid"></div>
+
+        <div class="feedback-overlay" id="feedback">
+            <h1 style="font-size:3rem;margin:0;">🔬</h1>
+            <h2 style="color:#00a8ff;" id="fb-title">ODAKLANDIK!</h2>
+            <p id="fb-msg" style="color:#aaa;"></p>
+            <div class="secret-reveal" id="secret-reveal">
+                🔐 GİZLİ HECE:<br>
+                <span class="secret-letter-big">LA</span><br>
+                <small style="color:#aaa;">Bu iki harfi şifre paneline! (kutu 5 ve 6)</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SONRAKİ NUMUNE ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#6c5ce7;" onclick="gorevTamamla()">🏠
+                Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">🔬 GÖREV: SAYI MİKROSKOBU</h3>
+            <p><b style="color:#00a8ff;">MAT.5.1.4</b> — Ondalık sayıların sayı doğrusundaki yerini bul.</p>
+            <hr style="border-color:rgba(0,168,255,0.2);margin:15px 0;">
+            <p>📌 Sayı doğrusundaki sarı noktanın düştüğü aralığı seç.</p>
+            <p>💡 Ondalık basamaklara dikkat! 45,90 ile 45,09 çok farklı.</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: SAYI MİKROSKOBU</h3>
+            <p style="font-size:0.85rem;color:#aaa;">Sayı doğrusunu CSS ile nasıl oluşturdum?</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="copy-btn" onclick="kopyala()" style="flex:1;">📋 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank"
+                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
+                    Talent14</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 4, harf: 'LA' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu4.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu4.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+
+        // Ondalık büyüklük karşılaştırma: Doğru aralığı bul
+        const levels = [
+            { frac: "24,25", val: 24.25, left: 24.0, right: 24.5, correct: "24,0 – 24,5", choices: ["24,0 – 24,5", "24,5 – 25,0", "23,0 – 24,0", "25,0 – 26,0"], hint: "24,25 sayısı 24,0 ile 24,5 arasında." },
+            { frac: "45,09", val: 45.09, left: 45.0, right: 45.1, correct: "45,0 – 45,1", choices: ["45,9 – 46,0", "45,0 – 45,1", "45,5 – 45,9", "44,0 – 45,0"], hint: "TUZAK! 45,09 < 45,10. Yani 45,0 ile 45,1 arasında!" },
+            { frac: "85,52", val: 85.52, left: 85.5, right: 85.6, correct: "85,5 – 85,6", choices: ["85,0 – 85,5", "85,5 – 85,6", "85,6 – 85,7", "86,0 – 87,0"], hint: "85,52 = 85,5 ile 85,6 arasında." },
+            { frac: "11,99", val: 11.99, left: 11.9, right: 12.0, correct: "11,9 – 12,0", choices: ["11,0 – 11,9", "11,9 – 12,0", "12,0 – 12,1", "10,0 – 11,0"], hint: "11,99 sayısı tam 12,00'dan sadece 0,01 küçük!" },
+            { frac: "30,12", val: 30.12, left: 30.1, right: 30.2, correct: "30,1 – 30,2", choices: ["30,0 – 30,1", "30,1 – 30,2", "30,2 – 30,3", "29,0 – 30,0"], hint: "30,12 sayısı 30,1 ile 30,2 arasında." }
+        ];
+        let currentIdx = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('level-idx').innerText = (currentIdx + 1) + '/' + levels.length;
+            document.getElementById('q-frac').innerText = d.frac;
+            document.getElementById('label-left').innerText = String(d.left).replace('.', ',');
+            document.getElementById('label-right').innerText = String(d.right).replace('.', ',');
+            // Nokta pozisyonu: 5% ile 95% arası
+            const pct = 5 + 90 * ((d.val - d.left) / (d.right - d.left));
+            document.getElementById('target-dot').style.left = pct + '%';
+            document.getElementById('feedback').style.display = 'none';
+            renderChoices(d);
+        }
+        function renderChoices(d) {
+            const g = document.getElementById('choicesGrid'); g.innerHTML = '';
+            const shuffled = [...d.choices].sort(() => Math.random() - 0.5);
+            shuffled.forEach(c => {
+                const btn = document.createElement('div');
+                btn.className = 'choice-card'; btn.innerText = c;
+                btn.onclick = () => checkAnswer(c, d);
+                g.appendChild(btn);
+            });
+        }
+        function checkAnswer(choice, d) {
+            if (choice === d.correct) {
+                const isLast = currentIdx === levels.length - 1;
+                document.getElementById('fb-title').innerText = isLast ? 'MİKROSKOP USTASI!' : 'ODAKLANDIK!';
+                document.getElementById('fb-msg').innerText = isLast ? 'Tüm ondalık sayıları doğru analiz ettin. İşte gizli hece:' : d.hint;
+                document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                document.getElementById('feedback').style.display = 'flex';
+            } else {
+                alert('Yanlış aralık! ' + d.hint);
+            }
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

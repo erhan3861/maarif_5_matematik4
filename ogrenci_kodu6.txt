@@ -1,0 +1,351 @@
+<!-- ============================================================
+   ♻️ YEŞİL GELECEK - ÖĞRENCİ KODU
+   📌 Konu: Çevre Verilerini Karşılaştırma (MAT ile Fen Entegrasyonu)
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — Kesir, ondalık, yüzde karşılaştırması + çevre anlayışı
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Yeşil Gelecek - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL (Cyber/Eko Tema) ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Çok koyu yeşil: Orman/gece teması */
+            background-color: #051e11;
+            /* İnce yeşil ızgara çizgileri (teknoloji etkisi) */
+            background-image:
+                linear-gradient(
+                    0deg,
+                    transparent 24%,
+                    rgba(0,255,128,0.05) 25%,
+                    rgba(0,255,128,0.05) 26%,
+                    transparent 27%
+                ),
+                linear-gradient(
+                    90deg,
+                    transparent 24%,
+                    rgba(0,255,128,0.05) 25%,
+                    rgba(0,255,128,0.05) 26%,
+                    transparent 27%
+                );
+            background-size: 50px 50px;
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            /* Neon yeşil metin rengi */
+            color: #00ff80;
+            overflow: hidden;
+        }
+
+        h2 {
+            color: #00ff80;
+            /* text-shadow = Neon parıltı efekti */
+            text-shadow: 0 0 10px #00ff80;
+            font-size: 1.4rem;
+        }
+
+        /* ===== KOMUTA MERKEZİ ===== */
+        .komuta {
+            width: 90%;
+            max-width: 700px;
+            background: rgba(0, 20, 10, 0.85);
+            /* Neon kenarlık */
+            border: 2px solid #00ff80;
+            border-radius: 18px;
+            padding: 20px;
+            /* box-shadow = Dışa yeşil parıltı */
+            box-shadow: 0 0 40px rgba(0,255,128,0.1);
+        }
+
+        /* Başlık alanı */
+        .baslik {
+            text-align: center;
+            border-bottom: 1px solid rgba(0,255,128,0.2);
+            padding-bottom: 12px;
+            margin-bottom: 18px;
+        }
+        .konu { color: #aaa; font-size: 0.8rem; letter-spacing: 2px; margin-top: 5px; }
+
+        /* ===== VERİ PANELLERİ ===== */
+        .paneller {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .panel {
+            flex: 1;                    /* Eşit genişlik (flex: 1 = mevcut alanı paylaş) */
+            background: rgba(0,255,128,0.05);
+            border: 1px solid rgba(0,255,128,0.25);
+            border-radius: 10px;
+            padding: 18px;
+            text-align: center;
+            cursor: pointer;
+            /* transition = Hover animasyonu */
+            transition: all 0.3s;
+        }
+
+        /* Hover: Tıklanabilir olduğunu hissettir */
+        .panel:hover {
+            background: rgba(0,255,128,0.12);
+            border-color: #00ff80;
+            transform: translateY(-4px);
+        }
+
+        /* Panel başlığı */
+        .panel-baslik {
+            font-size: 1rem;
+            color: #fff;
+            margin-bottom: 10px;
+            font-weight: bold;
+        }
+
+        /* Büyük değer gösterimi */
+        .panel-deger {
+            font-size: 2.8rem;
+            font-weight: bold;
+        }
+        /* Her bölgenin farklı rengi */
+        .panel-a .panel-deger { color: #ff9f43; text-shadow: 0 0 10px #ff9f43; }
+        .panel-b .panel-deger { color: #00d2ff; text-shadow: 0 0 10px #00d2ff; }
+
+        /* Veri ilerleme çubuğu */
+        .veri-cubu {
+            width: 80%;
+            height: 10px;
+            background: #111;          /* Koyu arka plan */
+            margin: 12px auto 0;
+            border-radius: 5px;
+            overflow: hidden;          /* Taşan kısmı gizle */
+        }
+        /* İlerleme dolumu */
+        .veri-dolum {
+            height: 100%;
+            width: 0%;                 /* JS ile doldurulacak */
+            border-radius: 5px;
+            /* transition = Dolum animasyonu */
+            transition: width 1s ease;
+        }
+        .panel-a .veri-dolum { background: #ff9f43; }
+        .panel-b .veri-dolum { background: #00d2ff; }
+
+        /* ===== SORU ALANI ===== */
+        .soru {
+            text-align: center;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #fff;
+            margin-bottom: 12px;
+        }
+        .ipucu { color: #888; font-size: 0.8rem; text-align: center; }
+
+        .mesaj { text-align: center; margin-top: 12px; font-size: 0.9rem; font-weight: bold; min-height:20px; }
+    </style>
+</head>
+<body>
+
+    <h2>♻️ Yeşil Gelecek</h2>
+
+    <div class="komuta">
+        <div class="baslik">
+            <div style="font-size:0.9rem; letter-spacing:3px;">EKO-KOMUTA MERKEZİ</div>
+            <div class="konu" id="konu-goster">KONU: YÜKLENİYOR...</div>
+        </div>
+
+        <!-- İki veri paneli -->
+        <div class="paneller">
+            <!-- Panel A -->
+            <div class="panel panel-a" onclick="bolgeAc('A')">
+                <div class="panel-baslik" id="isim-a">BÖLGE A</div>
+                <div class="panel-deger"  id="deger-a">—</div>
+                <div class="veri-cubu">
+                    <div class="veri-dolum" id="dolum-a"></div>
+                </div>
+            </div>
+            <!-- Panel B -->
+            <div class="panel panel-b" onclick="bolgeAc('B')">
+                <div class="panel-baslik" id="isim-b">BÖLGE B</div>
+                <div class="panel-deger"  id="deger-b">—</div>
+                <div class="veri-cubu">
+                    <div class="veri-dolum" id="dolum-b"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="soru" id="soru">SORU YÜKLENİYOR...</div>
+        <div class="ipucu" id="ipucu">(Doğru panele tıkla)</div>
+        <div class="mesaj" id="mesaj"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: GÖREV VERİLERİ
+    // ============================================================
+
+    // Her nesne bir analiz görevini temsil eder:
+    //   konu = Hangi çevre konusu?
+    //   soru = Ekrana gösterilecek soru metni
+    //   tur  = "max" (büyük olanı seç) veya "min" (küçük olanı seç)
+    //   a    = A bölgesinin bilgileri
+    //     isim   = Bölge adı
+    //     goster = Ekranda gösterilecek değer (kesir/ondalık/yüzde)
+    //     deger  = Sayısal değer (karşılaştırmak için)
+    //
+    // 💡 max/min mantığı:
+    //   GERİ DÖNÜŞÜM: Hangisi DAHA ÇOK yapıyor? → max (büyük)
+    //   ORMAN KAYBI:  Hangisi DAHA AZ kaybediyor? → min (küçük)
+    const gorevler = [
+        {
+            konu: "GERİ DÖNÜŞÜM ORANI",
+            soru: "HANGİSİ DAHA ÇOK GERİ DÖNÜŞÜM YAPIYOR?",
+            tur: "max",
+            a: { isim: "ŞEHİR A", goster: "1/2",  deger: 0.5  },
+            b: { isim: "ŞEHİR B", goster: "%25",   deger: 0.25 }
+        },
+        {
+            konu: "ORMANLIK ALAN KAYBI",
+            soru: "HANGİ BÖLGEDE ORMAN KAYBI DAHA AZ?",
+            tur: "min",
+            a: { isim: "BÖLGE X", goster: "0,4",   deger: 0.4 },
+            b: { isim: "BÖLGE Y", goster: "3/10",  deger: 0.3 }
+        },
+        {
+            konu: "YENİLENEBİLİR ENERJİ",
+            soru: "HANGİSİ DAHA ÇOK GÜNEŞ ENERJİSİ KULLANIYOR?",
+            tur: "max",
+            a: { isim: "TESİS 1", goster: "19/20", deger: 0.95 },
+            b: { isim: "TESİS 2", goster: "%90",   deger: 0.90 }
+        }
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutIdx = 0;
+
+    window.onload = function() { gorevYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: GÖREV YÜKLEME
+    // ============================================================
+
+    function gorevYukle() {
+        if (mevcutIdx >= gorevler.length) {
+            document.querySelector('.komuta').innerHTML =
+                '<h2 style="color:#00ff80;text-align:center;">🌍 GEZEGEN KURTARILDI!</h2>' +
+                '<p style="text-align:center;color:#aaa;">Tüm analizler tamamlandı!</p>';
+            return;
+        }
+
+        const g = gorevler[mevcutIdx];
+        document.getElementById('konu-goster').innerText = 'KONU: ' + g.konu;
+        document.getElementById('soru').innerText        = g.soru;
+        document.getElementById('mesaj').innerText       = '';
+
+        // Her iki paneli güncelle
+        panelGuncelle('a', g.a);
+        panelGuncelle('b', g.b);
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: PANEL GÜNCELLEME
+    // ============================================================
+
+    function panelGuncelle(id, bilgi) {
+        document.getElementById('isim-'  + id).innerText = bilgi.isim;
+        document.getElementById('deger-' + id).innerText = bilgi.goster;
+
+        // Çubuk animasyonu:
+        // Önce sıfır yap → Sonra setTimeout ile genişlet
+        // Bu sayede her seferinde "dolan" animasyonu görünür
+        const dolum = document.getElementById('dolum-' + id);
+        dolum.style.width = '0%';   // Sıfırla
+
+        // setTimeout(fonk, ms) = ms milisaniye sonra fonksiyonu çalıştır
+        // 100ms = 0.1 saniye bekle (animasyon için küçük bir gecikme)
+        setTimeout(function() {
+            // bilgi.deger × 100 → Yüzdeye çevir
+            dolum.style.width = (bilgi.deger * 100) + '%';
+        }, 100);
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 5: BÖLGE SEÇİMİ VE KONTROL
+    // ============================================================
+
+    function bolgeAc(secilen) {
+        const g = gorevler[mevcutIdx];
+
+        // Doğru cevabı bul:
+        // tur="max" → Büyük olanı bul
+        // tur="min" → Küçük olanı bul
+        let dogru = '';
+        if (g.tur === 'max') {
+            dogru = (g.a.deger > g.b.deger) ? 'A' : 'B';
+        } else {
+            dogru = (g.a.deger < g.b.deger) ? 'A' : 'B';
+        }
+
+        const mesaj = document.getElementById('mesaj');
+        if (secilen === dogru) {
+            // ✅ Doğru bölge!
+            mesaj.innerText  = '✅ Doğru! Eko-sistem dengelendi.';
+            mesaj.style.color = '#00ff80';
+            setTimeout(function() { mevcutIdx++; gorevYukle(); }, 2000);
+        } else {
+            const turIpucu = g.tur === 'max' ? 'Büyük olanı seç!' : 'Küçük olanı seç!';
+            alert('Hatalı analiz!\n💡 ' + turIpucu + '\n' +
+                  'A: ' + g.a.goster + '  |  B: ' + g.b.goster);
+        }
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Panel A rengini değiştir
+→ .panel-a .panel-deger { color: #ff9f43; } satırını bul
+→ #ff9f43 yerine #e84393 (pembe) yaz
+→ Aynı satırda text-shadow'u da #e84393 yap
+→ Panel A pembe neon renk alacak!
+
+GÖREV 2 (Kolay): Yeni bir analiz görevi ekle
+→ const gorevler = [ ... ]; dizisine ekle:
+   , {
+       konu: "DOĞAL ALAN KORUMA",
+       soru: "HANGİ BÖLGEDE DAHA FAZLA DOĞAL ALAN KORUNUYOR?",
+       tur: "max",
+       a: { isim: "İL A", goster: "3/4",  deger: 0.75 },
+       b: { isim: "İL B", goster: "%60",  deger: 0.60 }
+   }
+→ 3/4 = 0.75 > %60 = 0.60 → A kazanır!
+
+GÖREV 3 (Orta): Çubuk animasyon süresini yavaşlat
+→ .veri-dolum { transition: width 1s ease; } satırını bul
+→ 1s yerine 2s yaz
+→ setTimeout içindeki 100'ü 200 yap
+→ Görsel efekt daha dramatik görünecek!
+
+GÖREV 4 (Zor): Kaçıncı görevde olduğunu büyük harflerle göster
+→ gorevYukle() fonksiyonunda belgeye ekle:
+   const ilerleme = (mevcutIdx + 1) + '/' + gorevler.length;
+   document.getElementById('konu-goster').innerText =
+       '[' + ilerleme + '] KONU: ' + g.konu;
+→ Artık "KONU:" yerine "[1/3] KONU:" şeklinde gösterecek!
+
+============================================================ -->

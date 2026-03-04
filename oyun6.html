@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Yeşil Gelecek - Görev 6</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;700&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Rajdhani', sans-serif;
+            background-color: #051e11;
+            background-image: linear-gradient(0deg, transparent 24%, rgba(0, 255, 128, .05) 25%, rgba(0, 255, 128, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 128, .05) 75%, rgba(0, 255, 128, .05) 76%, transparent 77%, transparent), linear-gradient(90deg, transparent 24%, rgba(0, 255, 128, .05) 25%, rgba(0, 255, 128, .05) 26%, transparent 27%, transparent 74%, rgba(0, 255, 128, .05) 75%, rgba(0, 255, 128, .05) 76%, transparent 77%, transparent);
+            background-size: 50px 50px;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #00ff80;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(2, 12, 6, 0.92);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+            border-bottom: 1px solid rgba(0, 255, 128, 0.3);
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.85rem;
+            color: #00ff80;
+            letter-spacing: 2px;
+        }
+
+        .hud-btn {
+            background: rgba(0, 255, 128, 0.05);
+            border: 1px solid rgba(0, 255, 128, 0.3);
+            color: #00ff80;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #00ff80;
+            color: #051e11;
+        }
+
+        .btn-code {
+            border-color: #00d2ff;
+            color: #00d2ff;
+        }
+
+        .btn-code:hover {
+            background: #00d2ff;
+            color: #000;
+        }
+
+        .dashboard {
+            width: 95%;
+            max-width: 1000px;
+            height: 78vh;
+            display: grid;
+            grid-template-columns: 1fr 280px 1fr;
+            grid-template-rows: auto 1fr auto;
+            gap: 12px;
+            padding: 18px;
+            background: rgba(0, 20, 10, 0.8);
+            border: 2px solid #00ff80;
+            border-radius: 20px;
+            box-shadow: 0 0 50px rgba(0, 255, 128, 0.1), inset 0 0 50px rgba(0, 0, 0, 0.8);
+            position: relative;
+            margin-top: 55px;
+        }
+
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 5px;
+            background: rgba(0, 255, 128, 0.5);
+            box-shadow: 0 0 10px #00ff80;
+            animation: scan 3s linear infinite;
+            pointer-events: none;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0%;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .dash-header {
+            grid-column: 1/-1;
+            text-align: center;
+            border-bottom: 1px solid rgba(0, 255, 128, 0.3);
+            padding-bottom: 10px;
+        }
+
+        .mission-title {
+            font-family: 'Orbitron';
+            font-size: 1.4rem;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ff80;
+        }
+
+        .mission-info-bar {
+            color: #88dda5;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .center-panel {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .globe-holo {
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: radial-gradient(circle, #0044ff 20%, #000 100%);
+            border: 2px solid #00aaff;
+            box-shadow: 0 0 30px #00aaff;
+            animation: pulseGlobe 4s infinite ease-in-out;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3.5rem;
+        }
+
+        @keyframes pulseGlobe {
+
+            0%,
+            100% {
+                box-shadow: 0 0 20px #00aaff;
+            }
+
+            50% {
+                box-shadow: 0 0 40px #00aaff, 0 0 60px rgba(0, 170, 255, 0.2);
+            }
+        }
+
+        .data-panel {
+            background: rgba(0, 255, 128, 0.05);
+            border: 1px solid rgba(0, 255, 128, 0.3);
+            border-radius: 10px;
+            padding: 18px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-panel:hover {
+            background: rgba(0, 255, 128, 0.1);
+            border-color: #fff;
+            transform: translateY(-3px);
+        }
+
+        .panel-title {
+            font-family: 'Orbitron';
+            font-size: 1.1rem;
+            color: #fff;
+            margin-bottom: 8px;
+        }
+
+        .panel-value {
+            font-size: 3rem;
+            font-weight: bold;
+            text-shadow: 0 0 10px currentColor;
+        }
+
+        .panel-bar {
+            width: 80%;
+            height: 10px;
+            background: #333;
+            margin-top: 12px;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        .panel-progress {
+            height: 100%;
+            width: 0%;
+            transition: width 1s ease;
+        }
+
+        .region-a {
+            color: #ff9f43;
+        }
+
+        .region-a .panel-progress {
+            background: #ff9f43;
+        }
+
+        .region-b {
+            color: #00d2ff;
+        }
+
+        .region-b .panel-progress {
+            background: #00d2ff;
+        }
+
+        .action-panel {
+            grid-column: 1/-1;
+            text-align: center;
+            padding-top: 8px;
+        }
+
+        .question-text {
+            font-size: 1.4rem;
+            margin-bottom: 15px;
+            color: #fff;
+            font-weight: bold;
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.97);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 18px;
+            text-align: center;
+        }
+
+        .badge-icon {
+            font-size: 4.5rem;
+            margin-bottom: 15px;
+            animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes popIn {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .next-btn {
+            margin-top: 20px;
+            padding: 12px 40px;
+            background: #00ff80;
+            color: #000;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            font-family: 'Orbitron';
+            font-size: 1rem;
+            box-shadow: 0 0 20px rgba(0, 255, 128, 0.5);
+        }
+
+        .secret-reveal {
+            border: 4px solid #fff;
+            padding: 25px;
+            border-radius: 15px;
+            background: rgba(255, 255, 255, 0.08);
+            margin-top: 20px;
+            display: none;
+            box-shadow: 0 0 50px rgba(255, 255, 255, 0.2);
+        }
+
+        .secret-letter-big {
+            font-size: 4rem;
+            color: #fff;
+            font-weight: 900;
+            font-family: 'Orbitron';
+            text-shadow: 0 0 20px #00ff80;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #061910;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #e0e0e0;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #00ff80;
+            box-shadow: 0 0 20px rgba(0, 255, 128, 0.15);
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #00ff80;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #020e06;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #00d2ff;
+            color: #000;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+            font-weight: bold;
+        }
+
+        @media(max-width:800px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto auto auto auto;
+                height: auto;
+                padding-bottom: 50px;
+            }
+
+            .center-panel {
+                display: none;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">♻️ YEŞİL GELECEK</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="dashboard">
+        <div class="scan-line"></div>
+        <div class="dash-header">
+            <div class="mission-title">EKO-KOMUTA MERKEZİ</div>
+            <div class="mission-info-bar">
+                <span id="topic-text">KONU: YÜKLENİYOR...</span>
+                <span>|</span>
+                <span>SEVİYE: <span id="level-idx">1/5</span></span>
+            </div>
+        </div>
+
+        <div class="data-panel region-a" onclick="selectRegion('A')">
+            <div class="panel-title" id="name-a">BÖLGE A</div>
+            <div class="panel-value" id="val-a">—</div>
+            <div class="panel-bar">
+                <div class="panel-progress" id="bar-a"></div>
+            </div>
+        </div>
+
+        <div class="center-panel">
+            <div class="globe-holo">🌍</div>
+            <div style="margin-top:15px;font-size:0.75rem;letter-spacing:2px;color:#00aaff;">VERİ AKIŞI AKTİF</div>
+        </div>
+
+        <div class="data-panel region-b" onclick="selectRegion('B')">
+            <div class="panel-title" id="name-b">BÖLGE B</div>
+            <div class="panel-value" id="val-b">—</div>
+            <div class="panel-bar">
+                <div class="panel-progress" id="bar-b"></div>
+            </div>
+        </div>
+
+        <div class="action-panel">
+            <div class="question-text" id="question">SORU YÜKLENİYOR...</div>
+            <div style="color:#888;font-size:0.9rem;">(Doğru panelin üzerine tıkla)</div>
+        </div>
+
+        <div class="feedback-overlay" id="feedback">
+            <div class="badge-icon">🌱</div>
+            <h2 style="color:#00ff80;font-family:'Orbitron';font-size:2rem;" id="fb-title">ANALİZ DOĞRU!</h2>
+            <p id="fb-msg" style="color:#fff;font-size:1.1rem;">Müdahale ekibi yola çıktı.</p>
+            <div class="secret-reveal" id="secret-reveal">
+                <div style="font-size:0.9rem;letter-spacing:2px;color:#aaa;margin-bottom:5px;">GİZLİ ŞİFRE PARÇASI:
+                </div>
+                <span class="secret-letter-big">A</span><br>
+                <small style="color:#aaa;">Bu harfi şifre paneline! (kutu 8)</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SONRAKİ GÖREV ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#00d2ff;color:#000;"
+                onclick="gorevTamamla()">🏠 Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">♻️ GÖREV: YEŞİL GELECEK</h3>
+            <p><b style="color:#00ff80;">MAT.5.1.4</b> — Çevre verilerini karşılaştır, doğru bölgeyi seç.</p>
+            <hr style="border-color:rgba(0,255,128,0.2);margin:15px 0;">
+            <p>📌 İki bölgenin çevre verisini (kesir/ondalık/yüzde) karşılaştır.</p>
+            <p>💡 MAX sorusunda büyük olanı, MIN sorusunda küçük olanı seç!</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: YEŞİL GELECEK</h3>
+            <p style="font-size:0.85rem;color:#aaa;">Veri panellerini ve bar animasyonunu incele!</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <div style="display:flex;gap:8px;margin-top:10px;">
+                <button class="copy-btn" onclick="kopyala()" style="flex:1;">📋 KODU KOPYALA</button>
+                <a href="https://app.talent14.com/codeEditor" target="_blank"
+                    style="flex:1;display:flex;align-items:center;justify-content:center;background:#6e40c9;color:#fff;border-radius:6px;text-decoration:none;font-size:0.85rem;padding:8px;">✨
+                    Talent14</a>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 6, harf: 'A' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu6.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu6.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+
+        const levels = [
+            { topic: "GERİ DÖNÜŞÜM ORANI", q: "HANGİSİ DAHA ÇOK GERİ DÖNÜŞÜM YAPIYOR?", type: "max", a: { name: "ŞEHİR A", label: "1/2", val: 0.5 }, b: { name: "ŞEHİR B", label: "%25", val: 0.25 } },
+            { topic: "ORMANLIK ALAN KAYBI", q: "HANGİ BÖLGEDE ORMAN KAYBI DAHA AZ?", type: "min", a: { name: "BÖLGE X", label: "0,4", val: 0.4 }, b: { name: "BÖLGE Y", label: "3/10", val: 0.3 } },
+            { topic: "YENİLENEBİLİR ENERJİ", q: "HANGİSİ DAHA ÇOK GÜNEŞ ENERJİSİ KULLANIYOR?", type: "max", a: { name: "TESİS 1", label: "19/20", val: 0.95 }, b: { name: "TESİS 2", label: "%90", val: 0.90 } },
+            { topic: "HAVA KİRLİLİĞİ ORANI", q: "HANGİ ŞEHRİN HAVASI DAHA TEMİZ (KİRLİLİK AZ)?", type: "min", a: { name: "ŞEHİR K", label: "4/100", val: 0.04 }, b: { name: "ŞEHİR L", label: "0,1", val: 0.1 } },
+            { topic: "ATIK SU ARITMA", q: "HANGİSİ DAHA ÇOK SU ARITIYOR?", type: "max", a: { name: "MERKEZ A", label: "3/4", val: 0.75 }, b: { name: "MERKEZ B", label: "0,80", val: 0.80 } }
+        ];
+        let currentIdx = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('level-idx').innerText = (currentIdx + 1) + '/' + levels.length;
+            document.getElementById('topic-text').innerText = `KONU: ${d.topic}`;
+            document.getElementById('question').innerText = d.q;
+            document.getElementById('feedback').style.display = 'none';
+            updatePanel('a', d.a); updatePanel('b', d.b);
+        }
+        function updatePanel(id, info) {
+            document.getElementById(`name-${id}`).innerText = info.name;
+            document.getElementById(`val-${id}`).innerText = info.label;
+            const bar = document.getElementById(`bar-${id}`);
+            bar.style.width = '0%';
+            setTimeout(() => { bar.style.width = (info.val * 100) + '%'; }, 100);
+        }
+        function selectRegion(choice) {
+            const d = levels[currentIdx];
+            let correct = d.type === 'max' ? (d.a.val > d.b.val ? 'A' : 'B') : (d.a.val < d.b.val ? 'A' : 'B');
+            if (choice === correct) {
+                const isLast = currentIdx === levels.length - 1;
+                document.getElementById('fb-title').innerText = isLast ? 'GEZEGEN KURTARILDI!' : 'ANALİZ DOĞRU!';
+                document.getElementById('fb-msg').innerText = isLast ? 'Tüm analizler tamamlandı. İşte gizli harf:' : 'Eko-sistem dengelendi. Bir sonraki görev!';
+                document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                document.getElementById('feedback').style.display = 'flex';
+            } else {
+                alert('Hatalı Analiz! Verileri tekrar karşılaştır. ' + (d.type === 'max' ? 'Büyük olanı seç!' : 'Küçük olanı seç!'));
+            }
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

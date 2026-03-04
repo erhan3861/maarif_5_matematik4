@@ -1,0 +1,315 @@
+<!-- ============================================================
+   🎪 KESİR CAMBAZI - ÖĞRENCİ KODU
+   📌 Konu: Referans Noktalarıyla Kesri Konumlandırma
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — 0, 1/2 ve 1 referans noktalarına göre kesri yerleştir
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Kesir Cambazı - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background-color: #87CEEB;    /* Gökyüzü mavisi */
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        h2 { color: #2c3e50; }
+
+        /* ===== GÖSTERI SAHNESİ ===== */
+        .sahne {
+            background: rgba(255,255,255,0.92);
+            border: 5px solid #ff9f43;     /* Turuncu çerçeve */
+            border-radius: 20px;
+            padding: 25px;
+            width: 90%;
+            max-width: 700px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.3);
+            position: relative;           /* İçindeki absolutely positioned öğeler için */
+        }
+
+        /* ===== GÖREV KUTUSU ===== */
+        .gorev-kutu {
+            background: #c7ecee;           /* Açık mavi */
+            border: 2px dashed #22a6b3;   /* Kesik çizgili mavi kenarlık */
+            border-radius: 10px;
+            padding: 12px 25px;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            color: #2c3e50;
+        }
+        /* Büyük kesir gösterimi */
+        .kesir-goster {
+            font-size: 2.8rem;
+            font-weight: bold;
+            color: #d35400;                /* Turuncu-kırmızı */
+            /* text-shadow = Hafif gölge efekti */
+            text-shadow: 2px 2px 0px rgba(0,0,0,0.1);
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* ===== İP VE BÖLGELER ===== */
+        .ip-alani {
+            position: relative;            /* İçindeki öğeler pozisyon alabileceği için */
+            width: 100%;
+            height: 130px;
+            margin: 15px 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* İp (sayı doğrusu çizgisi) */
+        .ip {
+            position: absolute;
+            top: 70%;                     /* Dikeyde: yukarıdan %70 */
+            left: 5%; right: 5%;
+            height: 6px;
+            background: #8395a7;           /* Gri halat */
+            border-radius: 3px;
+            z-index: 1;                   /* Diğer öğelerin altında */
+        }
+
+        /* Sayı belirteçleri (0, 1/2, 1) */
+        .isaretciler {
+            position: absolute;
+            top: 75%;
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #576574;
+            /* transform: translateX(-50%) = Ortaya hizala */
+            transform: translateX(-50%);
+        }
+        .is-0   { left: 5%; }
+        .is-yar { left: 50%; }
+        .is-tam { left: 95%; }
+
+        /* Cambaz karakteri */
+        .cambaz {
+            font-size: 3.2rem;
+            position: absolute;
+            top: 22%;
+            left: 5%;                     /* Başlangıç pozisyonu */
+            /* transform: translateX(-50%) = Karakteri ortala */
+            transform: translateX(-50%);
+            z-index: 10;                  /* En üstte görünsün */
+            /* transition = Kayma animasyonu (1 saniye, eğrilen başlangıç) */
+            transition: left 1s cubic-bezier(0.45, 0.05, 0.55, 0.95);
+        }
+        /* Sallanma animasyonu: .sallan class eklenince */
+        .cambaz.sallan {
+            animation: sallan 0.5s infinite ease-in-out;
+        }
+
+        @keyframes sallan {
+            0%, 100% { transform: translateX(-50%) rotate(-5deg); }
+            50%      { transform: translateX(-50%) rotate(+5deg); }
+        }
+
+        /* ===== TIKLAMA BÖLGELERİ ===== */
+        .bolgeler {
+            position: absolute;
+            top: 0; left: 5%; right: 5%; bottom: 0;
+            display: flex;               /* Üç bölgeyi yan yana diz */
+            z-index: 5;
+        }
+
+        .bolge {
+            flex: 1;                     /* Eşit genişlik */
+            border: 2px dashed transparent;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 8px;
+            cursor: pointer;
+            transition: background 0.3s, border 0.3s;
+            border-radius: 10px;
+        }
+
+        /* Hover: Bölgenin üzerine gelince sarı vurgula */
+        .bolge:hover {
+            background: rgba(255, 234, 167, 0.3);
+            border-color: #fdcb6e;
+        }
+
+        .bolge-etiket {
+            background: rgba(255,255,255,0.8);
+            padding: 4px 8px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #e17055;
+        }
+
+        .mesaj { margin-top: 15px; font-size: 1rem; font-weight: bold; min-height: 20px; }
+    </style>
+</head>
+<body>
+
+    <h2>🎪 Kesir Cambazı</h2>
+
+    <div class="sahne">
+        <div class="gorev-kutu">
+            Bu kesir nereye daha yakın?
+            <span class="kesir-goster" id="kesir-goster">1/8</span>
+        </div>
+
+        <!-- İp üzerinde cambaz alanı -->
+        <div class="ip-alani">
+            <div class="ip"></div>
+            <span class="isaretciler is-0">0</span>
+            <span class="isaretciler is-yar">1/2</span>
+            <span class="isaretciler is-tam">1</span>
+
+            <!-- Cambaz karakteri (JS ile hareket eder) -->
+            <div class="cambaz" id="cambaz">🤹‍♂️</div>
+
+            <!-- Tıklanabilir bölgeler -->
+            <div class="bolgeler">
+                <div class="bolge" onclick="bolgeSec(0)">
+                    <div class="bolge-etiket">0'a YAKIN</div>
+                </div>
+                <div class="bolge" onclick="bolgeSec(0.5)">
+                    <div class="bolge-etiket">YARIM'a YAKIN</div>
+                </div>
+                <div class="bolge" onclick="bolgeSec(1)">
+                    <div class="bolge-etiket">TAM'a YAKIN</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="mesaj" id="mesaj"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: SORU VERİLERİ
+    // ============================================================
+
+    // Her nesne bir soruyu temsil eder:
+    //   yazi   = Kesirim ekranda görünen hali
+    //   hedef  = Hangi referans noktasına en yakın? (0 / 0.5 / 1)
+    //   ipucu  = Yanlış cevapta gösterilecek ipucu mesajı
+    //
+    // 💡 REFERANS NOKTASI MANTIĞI:
+    //   1/12 ≈ 0.083 → 0'a yakın (çünkü 0'dan uzaklığı: 0.083)
+    //   6/10 = 0.6   → 1/2'ye yakın (çünkü 0.5'e uzaklığı: 0.1)
+    //   9/10 = 0.9   → 1'e yakın (çünkü 1'e uzaklığı: 0.1)
+    const sorular = [
+        { yazi: "1/12", hedef: 0,   ipucu: "12 parçadan sadece 1'i. Sıfıra çok yakın!" },
+        { yazi: "6/10", hedef: 0.5, ipucu: "Yarısı 5/10 eder. 6/10, yarıma çok yakın!" },
+        { yazi: "9/10", hedef: 1,   ipucu: "10/10 tam olurdu. 9/10 buna çok yakın!" },
+        { yazi: "1/8",  hedef: 0,   ipucu: "8 parçadan sadece 1'i = 0.125. Sıfıra çok yakın!" }
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutIdx = 0;   // Hangi soruda?
+
+    window.onload = function() { soruYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: SORU YÜKLEME
+    // ============================================================
+
+    function soruYukle() {
+        if (mevcutIdx >= sorular.length) {
+            document.querySelector('.sahne').innerHTML =
+                '<h2 style="color:#54a0ff;">🎪 SİRKİN YILDIZI!</h2>' +
+                '<p>Tüm kesirleri doğru yerleştirdin!</p>';
+            return;
+        }
+        const s = sorular[mevcutIdx];
+        document.getElementById('kesir-goster').innerText = s.yazi;
+        document.getElementById('mesaj').innerText = '';
+
+        // Cambazı başlangıca al
+        const cambaz = document.getElementById('cambaz');
+        cambaz.style.left = '5%';           // Sola götür
+        cambaz.classList.remove('sallan');   // Sallanmayı durdur
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: BÖLGE SEÇİMİ
+    // ============================================================
+
+    function bolgeSec(secilen) {
+        const s = sorular[mevcutIdx];
+        const cambaz = document.getElementById('cambaz');
+
+        // Seçilen bölgeye göre cambazı götür
+        // (5% sol uç, 50% orta, 85% sağ uç)
+        let hedefSol = '5%';
+        if (secilen === 0)   hedefSol = '15%';   // Sola yakın
+        if (secilen === 0.5) hedefSol = '50%';   // Ortaya
+        if (secilen === 1)   hedefSol = '85%';   // Sağa yakın
+
+        cambaz.style.left = hedefSol;     // CSS transition sayesinde animasyonlu hareket!
+        cambaz.classList.add('sallan');   // Yürürken sallansın
+
+        // setTimeout = 1 saniye bekle (animasyon bitsin), sonra kontrol et
+        setTimeout(function() {
+            cambaz.classList.remove('sallan');   // Sallanmayı durdur
+
+            if (secilen === s.hedef) {
+                // ✅ Doğru bölge!
+                const mesaj = document.getElementById('mesaj');
+                mesaj.innerText = '✅ ' + s.ipucu;
+                mesaj.style.color = '#27ae60';
+                setTimeout(function() { mevcutIdx++; soruYukle(); }, 2000);
+            } else {
+                // ❌ Yanlış bölge!
+                alert('Dikkat! Cambaz dengesini kaybetti!\n\n💡 ' + s.ipucu);
+                cambaz.style.left = '5%';   // Başa dön
+            }
+        }, 1000);
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Cambaz karakterini değiştir
+→ <div class="cambaz" id="cambaz">🤹‍♂️</div> satırını bul
+→ 🤹‍♂️ emojisini 🐱 (kedi) ile değiştir
+→ Kedi ip üzerinde yürüyecek!
+
+GÖREV 2 (Kolay): Bölge üstündeki etiketlerin rengini değiştir
+→ .bolge-etiket { color: #e17055; } satırını bul
+→ #e17055 yerine #6c5ce7 (mor) yaz
+→ Bölge etiketleri mor renk alacak!
+
+GÖREV 3 (Orta): Yeni bir soru ekle
+→ const sorular = [ ... ]; dizisine ekle:
+   , { yazi: "2/5", hedef: 0.5,
+       ipucu: "5'in yarısı 2.5. 2 buna yakın, bu yüzden 1/2'ye yakın!" }
+→ 2/5 = 0.4. 0.5'e uzaklığı 0.1, 0'a uzaklığı 0.4 → 1/2'ye daha yakın!
+
+GÖREV 4 (Zor): Animasyon hızını değiştir
+→ .cambaz { transition: left 1s ... } satırını bul
+→ 1s yerine 2s yaz (2 saniye = yavaş yürüme)
+→ setTimeout içindeki 1000'i de 2000 yap (2000ms = 2 saniye)
+→ İki değeri aynı anda değiştirmek ZORUNLU!
+
+============================================================ -->

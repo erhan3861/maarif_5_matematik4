@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Adil Paylaşım - Görev 2</title>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700&family=Changa:wght@400;700&family=Fredoka:wght@400;600&display=swap"
+        rel="stylesheet">
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Changa', sans-serif;
+            background-color: #8bc34a;
+            background-image: repeating-linear-gradient(45deg, rgba(255, 255, 255, 0.1) 0, rgba(255, 255, 255, 0.1) 1px, transparent 1px, transparent 20px), radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.2) 0%, transparent 50%);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #333;
+            overflow: hidden;
+        }
+
+        .hud-bar {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            background: rgba(93, 64, 55, 0.92);
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            z-index: 100;
+        }
+
+        .hud-title {
+            font-family: 'Orbitron';
+            font-size: 0.9rem;
+            color: #a5d6a7;
+        }
+
+        .hud-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-family: 'Fredoka';
+            font-size: 0.85rem;
+        }
+
+        .hud-btn:hover {
+            background: #a5d6a7;
+            color: #2d3436;
+        }
+
+        .btn-code {
+            border-color: #795548;
+            color: #d7ccc8;
+        }
+
+        .btn-code:hover {
+            background: #795548;
+            color: #fff;
+        }
+
+        .game-board {
+            background: rgba(255, 255, 255, 0.92);
+            border: 8px solid #5d4037;
+            border-radius: 20px;
+            padding: 20px;
+            width: 90%;
+            max-width: 800px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            position: relative;
+            margin-top: 55px;
+        }
+
+        .level-badge {
+            background: #5d4037;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 15px;
+            font-size: 0.9rem;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-text {
+            font-size: 1.2rem;
+            color: #33691e;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .plots-container {
+            display: flex;
+            justify-content: center;
+            gap: 40px;
+            margin-bottom: 30px;
+            align-items: flex-end;
+        }
+
+        .plot-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .land-plot {
+            width: 180px;
+            height: 180px;
+            background: #fff;
+            border: 4px solid #333;
+            display: grid;
+            overflow: hidden;
+            box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .plot-cell {
+            border: 1px dashed rgba(0, 0, 0, 0.2);
+            background: #e0e0e0;
+            transition: background 0.3s;
+        }
+
+        .plot-cell.owned {
+            background: #8bc34a;
+            background-image: repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255, 255, 255, 0.3) 5px, rgba(255, 255, 255, 0.3) 10px);
+        }
+
+        .owner-label {
+            font-family: 'Changa';
+            font-size: 1.1rem;
+            font-weight: bold;
+            background: #333;
+            color: #fff;
+            padding: 5px 15px;
+            border-radius: 5px;
+        }
+
+        .compare-panel {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .comp-btn {
+            width: 65px;
+            height: 65px;
+            border-radius: 50%;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: white;
+            box-shadow: 0 4px 0 rgba(0, 0, 0, 0.3);
+            transition: transform 0.1s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-left,
+        .btn-right {
+            background: #e67e22;
+        }
+
+        .btn-eq {
+            background: #95a5a6;
+        }
+
+        .comp-btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        .comp-btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .feedback-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.97);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .secret-reveal {
+            border: 2px dashed #558b2f;
+            padding: 15px;
+            border-radius: 10px;
+            background: #dcedc8;
+            margin-top: 15px;
+            display: none;
+        }
+
+        .secret-letter-big {
+            font-size: 3.5rem;
+            color: #33691e;
+            font-weight: bold;
+            font-family: 'Orbitron';
+        }
+
+        .next-btn {
+            margin-top: 15px;
+            padding: 12px 30px;
+            background: #558b2f;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-family: 'Changa';
+            font-size: 1.1rem;
+        }
+
+        .discovery-area {
+            margin-top: 12px;
+            width: 100%;
+        }
+
+        .discovery-bubble {
+            background: rgba(241, 196, 15, 0.9);
+            border-left: 4px solid #e67e22;
+            padding: 8px 14px;
+            border-radius: 8px;
+            color: #333;
+            font-size: 0.82rem;
+            font-weight: 600;
+            text-align: center;
+            opacity: 0;
+            z-index: 50;
+            animation: bubbleFadeIn 0.8s ease forwards;
+        }
+
+        @keyframes bubbleFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-card {
+            background: #10142b;
+            border-radius: 15px;
+            padding: 22px;
+            max-width: 480px;
+            width: 90%;
+            position: relative;
+            color: #c8d6e5;
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-left: 4px solid #1dd1a1;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 16px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            border: none;
+            background: none;
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .modal-close:hover {
+            color: #f44336;
+        }
+
+        .modal-title {
+            font-family: 'Orbitron';
+            color: #a5d6a7;
+            margin: 0 0 15px 0;
+            font-size: 1.1rem;
+        }
+
+        .code-box {
+            background: #0d1117;
+            border-radius: 8px;
+            padding: 15px;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: #79c0ff;
+            max-height: 180px;
+            overflow-y: auto;
+            text-align: left;
+            white-space: pre-wrap;
+            word-break: break-all;
+        }
+
+        .copy-btn {
+            margin-top: 10px;
+            padding: 8px 18px;
+            background: #238636;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .talent-link {
+            display: block;
+            margin-top: 10px;
+            padding: 8px;
+            background: #6e40c9;
+            color: white;
+            border-radius: 6px;
+            text-decoration: none;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="hud-bar">
+        <button class="hud-btn" onclick="menuyeDon()">⌂ MENÜ</button>
+        <span class="hud-title">🌍 ADİL PAYLAŞIM</span>
+        <div style="display:flex;gap:8px;">
+            <button class="hud-btn" onclick="openModal('missionModal')">📜 GÖREV</button>
+            <button class="hud-btn btn-code" onclick="openModal('codeModal')">💻 KODLA</button>
+            <button class="hud-btn" onclick="toggleFullScreen()" id="screenBtn">⛶</button>
+        </div>
+    </div>
+
+    <div class="game-board">
+        <div class="level-badge">TAPU DAİRESİ: <span id="level-idx">1/5</span></div>
+        <div class="question-text">Hangi kardeşin arazisi daha büyük?</div>
+        <div class="plots-container">
+            <div class="plot-wrapper">
+                <div class="land-plot" id="plot-left"></div>
+                <div class="owner-label">ALİ (<span id="frac-l">1/2</span>)</div>
+            </div>
+            <div class="plot-wrapper">
+                <div class="land-plot" id="plot-right"></div>
+                <div class="owner-label">AYŞE (<span id="frac-r">1/4</span>)</div>
+            </div>
+        </div>
+        <div class="compare-panel">
+            <button class="comp-btn btn-left" onclick="checkAnswer('left')">&gt;</button>
+            <button class="comp-btn btn-eq" onclick="checkAnswer('equal')">=</button>
+            <button class="comp-btn btn-right" onclick="checkAnswer('right')">&lt;</button>
+        </div>
+        <div class="discovery-area" id="discoveryArea"></div>
+
+        <div class="feedback-overlay" id="feedback">
+            <h1 style="font-size:3.5rem;margin:0;">🌱</h1>
+            <h2 style="color:#558b2f;" id="fb-title">ADİL TESPİT!</h2>
+            <p id="fb-msg">Görsel modellerle doğru karşılaştırma yaptın.</p>
+            <div class="secret-reveal" id="secret-reveal">
+                🔐 GİZLİ HARF:<br>
+                <span class="secret-letter-big">I</span><br>
+                <small style="color:#666;">Bu harfi şifre panelinde kullan!</small>
+            </div>
+            <button class="next-btn" id="next-btn" onclick="nextLevel()">SIRADAKİ ARAZİ ▶</button>
+            <button class="next-btn" id="menu-btn" style="display:none;background:#33691e;" onclick="gorevTamamla()">🏠
+                Ana Menüye Dön</button>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="missionModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('missionModal')">×</button>
+            <h3 class="modal-title">🌍 GÖREV: ADİL PAYLAŞIM</h3>
+            <p><b style="color:#a5d6a7;">MAT.5.1.4</b> — Alan modeli ile kesirleri karşılaştır.</p>
+            <hr style="border-color:rgba(255,255,255,0.1);margin:15px 0;">
+            <p>📌 Arazilerin boyutuna bak. Sol &gt; Sağ, Eşit, Sol &lt; Sağ seç.</p>
+            <p>💡 Yeşil kare = Sahip olunan alan. Toplam kare = Payda!</p>
+        </div>
+    </div>
+    <div class="modal-overlay" id="codeModal">
+        <div class="modal-card">
+            <button class="modal-close" onclick="closeModal('codeModal')">×</button>
+            <h3 class="modal-title">💻 KODLA: ADİL PAYLAŞIM</h3>
+            <p style="font-size:0.85rem;color:#aaa;">CSS Grid ile arazileri nasıl böldük?</p>
+            <div class="code-box" id="codeContent">Yükleniyor...</div>
+            <button class="copy-btn" onclick="kopyala()">📋 Kopyala</button>
+            <a href="https://app.talent14.com/codeEditor" target="_blank" class="talent-link">✨ Talent14 Editörde Aç</a>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+        function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+        window.onclick = (e) => { if (e.target.classList.contains('modal-overlay')) closeModal(e.target.id); };
+        function menuyeDon() { if (window.parent !== window) window.parent.postMessage({ tip: 'MENUYE_DON' }, '*'); else window.location.href = 'index.html'; }
+        function gorevTamamla() { if (window.parent !== window) window.parent.postMessage({ tip: 'GOREV_TAMAM', id: 2, harf: 'I' }, '*'); else window.location.href = 'index.html'; }
+        function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen().catch(e => { }); else document.exitFullscreen(); }
+        document.addEventListener('fullscreenchange', () => { document.getElementById('screenBtn').innerText = document.fullscreenElement ? '↙' : '⛶'; });
+        function kopyala() { fetch('ogrenci_kodu2.txt').then(r => r.text()).then(t => { navigator.clipboard.writeText(t).then(() => alert('✅ Kopyalandı!')).catch(() => alert('Hata!')); }).catch(() => alert('Bulunamadı!')); }
+        fetch('ogrenci_kodu2.txt').then(r => r.text()).then(t => { document.getElementById('codeContent').textContent = t.substring(0, 800) + '...'; }).catch(() => { document.getElementById('codeContent').textContent = 'Yükleniyor...'; });
+        function showDiscovery(text) { document.getElementById('discoveryArea').innerHTML = `<div class="discovery-bubble">${text}</div>`; }
+
+        const levels = [
+            { l: { n: 1, d: 2, cols: 1, rows: 2, val: 0.5 }, r: { n: 1, d: 4, cols: 2, rows: 2, val: 0.25 } },
+            { l: { n: 2, d: 4, cols: 2, rows: 2, val: 0.5 }, r: { n: 1, d: 2, cols: 1, rows: 2, val: 0.5 } },
+            { l: { n: 3, d: 4, cols: 2, rows: 2, val: 0.75 }, r: { n: 2, d: 3, cols: 1, rows: 3, val: 0.66 } },
+            { l: { n: 1, d: 3, cols: 1, rows: 3, val: 0.33 }, r: { n: 2, d: 6, cols: 2, rows: 3, val: 0.33 } },
+            { l: { n: 4, d: 5, cols: 1, rows: 5, val: 0.8 }, r: { n: 9, d: 10, cols: 2, rows: 5, val: 0.9 } }
+        ];
+        const discoveries = [
+            "💡 1/2 = 2 bölmeden 1 tane. 1/4 = 4 bölmeden 1 tane. Alanlar neyi söylüyor?",
+            "💡 2/4 ve 1/2: Görünüş farklı ama alan aynı! Buna denk kesir denir.",
+            "💡 3/4 = 0,75 ve 2/3 ≈ 0,66. Sol arazi biraz daha büyük!",
+            "💡 1/3 ve 2/6 ekrana farklı görünse de ikisi eşit zemin kaplar!",
+            "💡 4/5 = 0,80 ve 9/10 = 0,90. Küçük fark büyük sonuç: Ayşe'nin arazisi daha büyük!"
+        ];
+        let currentIdx = 0;
+        window.onload = loadLevel;
+
+        function loadLevel() {
+            if (currentIdx >= levels.length) return;
+            const d = levels[currentIdx];
+            document.getElementById('level-idx').innerText = (currentIdx + 1) + '/' + levels.length;
+            document.getElementById('frac-l').innerText = `${d.l.n}/${d.l.d}`;
+            document.getElementById('frac-r').innerText = `${d.r.n}/${d.r.d}`;
+            document.getElementById('feedback').style.display = 'none';
+            renderPlot('plot-left', d.l); renderPlot('plot-right', d.r);
+            if (currentIdx > 0) showDiscovery(discoveries[currentIdx - 1]);
+        }
+        function renderPlot(id, p) {
+            const c = document.getElementById(id); c.innerHTML = '';
+            c.style.gridTemplateColumns = `repeat(${p.cols},1fr)`;
+            c.style.gridTemplateRows = `repeat(${p.rows},1fr)`;
+            for (let i = 0; i < p.d; i++) { const cell = document.createElement('div'); cell.className = 'plot-cell'; if (i < p.n) cell.classList.add('owned'); c.appendChild(cell); }
+        }
+        function checkAnswer(choice) {
+            const d = levels[currentIdx];
+            const correct = d.l.val > d.r.val ? 'left' : (d.r.val > d.l.val ? 'right' : 'equal');
+            if (choice === correct) {
+                const isLast = currentIdx === levels.length - 1;
+                document.getElementById('fb-title').innerText = isLast ? 'ADİL PAYLAŞIM!' : 'ADİL TESPİT!';
+                document.getElementById('fb-msg').innerText = isLast ? 'Kadastro işlemleri tamam. İşte gizli harf:' : 'Görsel modellerle doğru karşılaştırma yaptın.';
+                document.getElementById('secret-reveal').style.display = isLast ? 'block' : 'none';
+                document.getElementById('next-btn').style.display = isLast ? 'none' : 'inline-block';
+                document.getElementById('menu-btn').style.display = isLast ? 'inline-block' : 'none';
+                document.getElementById('feedback').style.display = 'flex';
+                if (isLast) showDiscovery(discoveries[4]);
+            } else {
+                alert('Hatalı Karar! Taralı alanların büyüklüğüne dikkatlice bak.');
+            }
+        }
+        function nextLevel() { currentIdx++; loadLevel(); }
+    </script>
+</body>
+
+</html>

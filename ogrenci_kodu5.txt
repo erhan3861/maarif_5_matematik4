@@ -1,0 +1,345 @@
+<!-- ============================================================
+   🏷️ ETİKET DEDEKTİFİ - ÖĞRENCİ KODU
+   📌 Konu: Ondalık Sayıları Karşılaştırarak Tasarruf Etme
+
+   Bu kodu Talent14 editörüne yapıştır ve çalıştır!
+   Sonra aşağıdaki GÖREVLERİ tamamla.
+
+   MAT.5.1.4 — Ondalık basamak karşılaştırması, bilinçli tüketici
+============================================================ -->
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <title>Etiket Dedektifi - Kodlama Pratiği</title>
+    <style>
+        /* ===== GENEL STIL ===== */
+        body {
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            /* Damalı zemin deseni: Market zeminini taklit eder */
+            background-color: #f5f6fa;
+            background-image:
+                linear-gradient(45deg, #dcdde1 25%, transparent 25%, transparent 75%, #dcdde1 75%),
+                linear-gradient(45deg, #dcdde1 25%, transparent 25%, transparent 75%, #dcdde1 75%);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px; /* İkinci desen 30px kaydırılmış */
+            height: 100vh;
+            font-family: Arial, sans-serif;
+            color: #2f3640;
+            overflow: hidden;
+        }
+
+        h2 { color: #e84118; margin-bottom: 15px; }
+
+        /* ===== MARKET RAFI ===== */
+        .market {
+            background: #fff;
+            border-radius: 15px;
+            padding: 20px;
+            width: 90%;
+            max-width: 650px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+            border: 4px solid #353b48;
+        }
+
+        /* Kırmızı üst banner */
+        .banner {
+            background: #e84118;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-weight: bold;
+        }
+
+        /* Yeşil tasarruf kutusu */
+        .tasarruf-kutu {
+            background: #27ae60;
+            padding: 4px 15px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* ===== ÜRÜN KARTLARI ===== */
+        .urunler {
+            display: flex;
+            gap: 30px;
+            justify-content: center;
+            margin: 15px 0;
+        }
+
+        .urun-karti {
+            background: white;
+            border: 2px solid #ddd;
+            border-radius: 12px;
+            padding: 18px;
+            width: 200px;
+            text-align: center;
+            cursor: pointer;
+            /* transition = Hover animasyonu */
+            transition: transform 0.3s, box-shadow 0.3s, border-color 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+
+        /* Üstüne gelince büyüt ve kaldır */
+        .urun-karti:hover {
+            transform: scale(1.05) translateY(-8px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+            border-color: #00a8ff;
+        }
+
+        /* Emoji ikon */
+        .urun-emoji {
+            font-size: 4rem;
+            display: block;
+            margin-bottom: 10px;
+            /* transition = Hover'da farklı ölçek için */
+            transition: transform 0.2s;
+        }
+        .urun-karti:hover .urun-emoji {
+            transform: scale(1.1);  /* Emojivi büyüt */
+        }
+
+        .urun-adi   { font-weight: bold; font-size: 1rem; color: #2f3640; display: block; margin-bottom: 10px; }
+        .urun-marka { font-size: 0.8rem; color: #aaa; }
+
+        /* ===== FİYAT ETİKETİ ===== */
+        .fiyat-etiketi {
+            background: #fbc531;           /* Sarı etiket */
+            color: #2f3640;
+            padding: 10px;
+            font-size: 1.4rem;
+            font-weight: 900;
+            /* border: 2px dashed = Kesik çizgili kenarlık (gerçek fiyat etiketi gibi) */
+            border: 2px dashed #2f3640;
+            border-radius: 5px;
+            display: inline-block;
+            /* transform: rotate = Hafif eğik yap */
+            transform: rotate(-2deg);
+        }
+        /* ::after = Sahte içerik ekle (TL soneki) */
+        .fiyat-etiketi::after {
+            content: " TL";
+            font-size: 0.8rem;
+            font-weight: normal;
+        }
+
+        /* Barkod süsü */
+        .barkod {
+            height: 10px;
+            width: 80%;
+            margin: 10px auto 0;
+            opacity: 0.5;
+            /* repeating-linear-gradient = Tekrar eden dikey çizgiler */
+            background: repeating-linear-gradient(
+                90deg,
+                #333 0,
+                #333 2px,
+                transparent 2px,
+                transparent 4px
+            );
+        }
+
+        .mesaj { text-align: center; margin-top: 12px; font-size: 0.95rem; font-weight: bold; min-height:20px; }
+    </style>
+</head>
+<body>
+
+    <h2>🏷️ Etiket Dedektifi</h2>
+
+    <div class="market">
+        <div class="banner">
+            <span>REYON <span id="seviyeNo">1/3</span></span>
+            <div class="tasarruf-kutu">
+                💰 TASARRUF: <span id="tasarruf">0,00</span> TL
+            </div>
+        </div>
+
+        <p style="text-align:center; color:#7f8fa6; margin-bottom:5px;">
+            🔍 Hangisi daha ekonomik (ucuz)?
+        </p>
+
+        <!-- Ürünler JS ile oluşturulacak -->
+        <div class="urunler" id="urunAlan"></div>
+
+        <div class="mesaj" id="mesaj"></div>
+    </div>
+
+    <script>
+    // ============================================================
+    // 📚 BÖLÜM 1: ÜRÜN VERİLERİ
+    // ============================================================
+
+    // Her nesne bir "reyon" (seviye) verisidir:
+    //   isim   = Ürün adı
+    //   emoji  = Emoji ikon
+    //   urunler = İki farklı marka ve fiyat
+    //     id      = Benzersiz kimlik (hangisi seçildi anlamak için)
+    //     fiyat   = Ondalık fiyat (TL)
+    //     marka   = Marka adı
+    //
+    // 💡 TUZAK SORU: 45,90 vs 45,09
+    //   45,90 = kırk beş tam doksan yüzde  → BÜYÜK
+    //   45,09 = kırk beş tam dokuz yüzde   → KÜÇÜK
+    //   Sondan sıfır okumayı YANILTIR!
+    const reyonlar = [
+        {
+            isim: "Süt (1L)", emoji: "🥛",
+            urunler: [
+                { id: 1, fiyat: 24.50, marka: "Marka A" },
+                { id: 2, fiyat: 24.25, marka: "Marka B" }  // UCUZ
+            ]
+        },
+        {
+            isim: "Pirinç (1kg)", emoji: "🍚",
+            urunler: [
+                { id: 1, fiyat: 45.90, marka: "Lüks" },    // TUZAK PAHALISI
+                { id: 2, fiyat: 45.09, marka: "Eko" }      // UCUZ
+            ]
+        },
+        {
+            isim: "Çikolata", emoji: "🍫",
+            urunler: [
+                { id: 1, fiyat: 12.00, marka: "Tam" },
+                { id: 2, fiyat: 11.99, marka: "Fırsat" }   // UCUZ (1 kuruş fark!)
+            ]
+        }
+    ];
+
+    // ============================================================
+    // 📚 BÖLÜM 2: DEĞİŞKENLER
+    // ============================================================
+
+    let mevcutIdx   = 0;   // Hangi reyondayız?
+    let toplamTasarruf = 0; // Toplam biriktirilen para (TL)
+
+    window.onload = function() { reyonYukle(); };
+
+    // ============================================================
+    // 📚 BÖLÜM 3: REYON YÜKLEME
+    // ============================================================
+
+    function reyonYukle() {
+        if (mevcutIdx >= reyonlar.length) {
+            document.querySelector('.market').innerHTML =
+                '<h2 style="color:#27ae60;text-align:center;">🛒 BİLİNÇLİ TÜKETİCİ!</h2>' +
+                '<p style="text-align:center;">Toplam Tasarruf: <b>' +
+                toplamTasarruf.toFixed(2).replace('.', ',') + ' TL</b></p>';
+            return;
+        }
+
+        const r = reyonlar[mevcutIdx];
+        document.getElementById('seviyeNo').innerText = (mevcutIdx + 1) + '/3';
+        document.getElementById('mesaj').innerText    = '';
+
+        const alan = document.getElementById('urunAlan');
+        alan.innerHTML = '';  // Önceki ürünleri temizle
+
+        // Ürünleri karıştır: Her seferinde farklı sıraya dizilsin
+        // [...array] = Dizinin bir kopyasını oluşturur (orjinalini bozmaz)
+        // .sort(() => Math.random() - 0.5) = Rastgele sırala
+        let karisik = [...r.urunler].sort(() => Math.random() - 0.5);
+
+        // forEach = Her ürün için kart oluştur
+        karisik.forEach(function(urun) {
+            const div = document.createElement('div');
+            div.className = 'urun-karti';
+            // onclick: Ok fonksiyonu (Arrow function)
+            // () => tek satırlık fonksiyon demek
+            div.onclick = () => fiyatKontrol(urun, karisik);
+
+            // innerHTML ile kart içeriği oluştur (Template literal)
+            div.innerHTML = `
+                <span class="urun-emoji">${r.emoji}</span>
+                <span class="urun-adi">${r.isim}
+                    <small class="urun-marka">${urun.marka}</small>
+                </span>
+                <div class="fiyat-etiketi">${urun.fiyat.toFixed(2).replace('.', ',')}</div>
+                <div class="barkod"></div>
+            `;
+            alan.appendChild(div);
+        });
+    }
+
+    // ============================================================
+    // 📚 BÖLÜM 4: FİYAT KONTROLÜ
+    // ============================================================
+
+    function fiyatKontrol(secilen, tumUrunler) {
+        // reduce() = Diziyi tek bir değere indirgeme
+        // prev.price < curr.price ? prev : curr
+        // = Her karşılaştırmada daha ucuz olanı tut
+        const enUcuz = tumUrunler.reduce(
+            (prev, curr) => prev.fiyat < curr.fiyat ? prev : curr
+        );
+
+        const mesaj = document.getElementById('mesaj');
+
+        if (secilen.id === enUcuz.id) {
+            // ✅ En ucuzu seçtin!
+            const pahali = tumUrunler.find(u => u.id !== secilen.id);
+            const kazan  = pahali.fiyat - secilen.fiyat;
+            toplamTasarruf += kazan;
+
+            // toFixed(2) = 2 ondalık basamak göster
+            document.getElementById('tasarruf').innerText =
+                toplamTasarruf.toFixed(2).replace('.', ',');
+
+            mesaj.innerText  = `✅ Harika! ${kazan.toFixed(2).replace('.', ',')} TL tasarruf ettin!`;
+            mesaj.style.color = '#27ae60';
+
+            // 2 saniye sonra bir sonraki reyona geç
+            setTimeout(function() { mevcutIdx++; reyonYukle(); }, 2000);
+        } else {
+            alert('Daha uygunu var!\n' +
+                  secilen.fiyat + ' > ' + enUcuz.fiyat +
+                  '\n💡 Ondalık basamaklara dikkat!');
+        }
+    }
+    </script>
+
+</body>
+</html>
+
+<!-- ============================================================
+🎯 GÖREVLER (Kodu değiştirerek dene!)
+============================================================
+
+GÖREV 1 (Kolay): Fiyat etiketinin rengini değiştir
+→ .fiyat-etiketi { background: #fbc531; } satırını bul
+→ #fbc531 (sarı) yerine #fd79a8 (pembe) yaz
+→ Fiyat etiketleri pembe renk alacak!
+
+GÖREV 2 (Kolay): Yeni bir ürün reyonu ekle
+→ const reyonlar = [ ... ]; dizisine ekle:
+   , {
+     isim: "Su (1.5L)", emoji: "💧",
+     urunler: [
+         { id: 1, fiyat: 5.90, marka: "Dağ Suyu" },   // UCUZ
+         { id: 2, fiyat: 5.99, marka: "Kaynak" }
+     ]
+   }
+→ 5,90 < 5,99 → Dağ Suyu daha ucuz!
+
+GÖREV 3 (Orta): Kartların sıralamasını KAPATMAK için
+→ let karisik = [...r.urunler].sort(() => Math.random() - 0.5); satırını bul
+→ Bunu şununla değiştir: let karisik = [...r.urunler];
+→ Artık pahalı ürün her zaman solda görünür.
+   Hangisi daha adil? Yorumunu ekle! // Sıralama kapatıldı
+
+GÖREV 4 (Zor): Kaç tane doğru yapıldığını say
+→ let dogru = 0; değişkenini BÖLÜM 2'ye ekle
+→ fiyatKontrol() içinde ✅ kısma ekle:
+   dogru++;
+   document.querySelector('.banner').innerText =
+       'REYON ' + (mevcutIdx+1) + '/3 | ✅ ' + dogru + ' doğru';
+
+============================================================ -->
